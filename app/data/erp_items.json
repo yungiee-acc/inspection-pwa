@@ -1,0 +1,98 @@
+[
+    {
+        "code":  "31001",
+        "name":  "PET無色容器",
+        "unit":  "粒",
+        "report_name":  "PET無色容積-2026"
+    },
+    {
+        "code":  "31001A032",
+        "name":  "PET無色容器客供",
+        "unit":  "KG",
+        "report_name":  "PET無色容積-2026"
+    },
+    {
+        "code":  "31002",
+        "name":  "PET有色容器(水藍)",
+        "unit":  "粒",
+        "report_name":  "PET有色容積-2026"
+    },
+    {
+        "code":  "31003",
+        "name":  "PET其他容器(第二類)",
+        "unit":  "粒",
+        "report_name":  "PET其他(第二類)-2026"
+    },
+    {
+        "code":  "31004",
+        "name":  "PET醬油容器",
+        "unit":  "粒",
+        "report_name":  "PET醬油-2026"
+    },
+    {
+        "code":  "31022",
+        "name":  "PET有色容器",
+        "unit":  "粒",
+        "report_name":  "PET有色容積-2026"
+    },
+    {
+        "code":  "31101",
+        "name":  "平板容器(PET)-2024",
+        "unit":  "粒",
+        "report_name":  null
+    },
+    {
+        "code":  "32001",
+        "name":  "PE乳品容器",
+        "unit":  "粒",
+        "report_name":  "PE乳品-2026"
+    },
+    {
+        "code":  "32002",
+        "name":  "PE清潔劑容器",
+        "unit":  "粒",
+        "report_name":  "PE清潔劑-2026"
+    },
+    {
+        "code":  "32003",
+        "name":  "PE優酪乳容器",
+        "unit":  "粒",
+        "report_name":  "PE清潔劑-2026"
+    },
+    {
+        "code":  "32004",
+        "name":  "PE速立康容器",
+        "unit":  "粒",
+        "report_name":  "PE清潔劑-2026"
+    },
+    {
+        "code":  "33001",
+        "name":  "PVC容器",
+        "unit":  "粒",
+        "report_name":  null
+    },
+    {
+        "code":  "33303",
+        "name":  "生質塑膠廢容器(PLA)",
+        "unit":  "粒",
+        "report_name":  null
+    },
+    {
+        "code":  "35001",
+        "name":  "PP容器",
+        "unit":  "粒",
+        "report_name":  "PP-2026"
+    },
+    {
+        "code":  "35002",
+        "name":  "PP餐容器",
+        "unit":  "粒",
+        "report_name":  "PP餐具-2026"
+    },
+    {
+        "code":  "36001",
+        "name":  "未發泡PS容器",
+        "unit":  "粒",
+        "report_name":  "未發泡PS-2026"
+    }
+]

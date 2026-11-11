@@ -1,0 +1,1106 @@
+[
+    {
+        "code":  "A001",
+        "short_name":  "全民",
+        "full_name":  "全民環保股份有限公司",
+        "tax_id":  "27355433",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A002",
+        "short_name":  "秉宏",
+        "full_name":  "秉宏環保有限公司",
+        "tax_id":  "28223283",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A003",
+        "short_name":  "富鉅",
+        "full_name":  "富鉅環保科技有限公司",
+        "tax_id":  "24313283",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A004",
+        "short_name":  "誠壕",
+        "full_name":  "誠壕工程有限公司",
+        "tax_id":  "42649508",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A005",
+        "short_name":  "鉅翔",
+        "full_name":  "鉅翔環保科技有限公司",
+        "tax_id":  "53760824",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A006",
+        "short_name":  "德基",
+        "full_name":  "德基環保有限公司",
+        "tax_id":  "24414711",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A007",
+        "short_name":  "德旺",
+        "full_name":  "德旺回收行",
+        "tax_id":  "26549284",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A008",
+        "short_name":  "昌和",
+        "full_name":  "昌和廢棄物處理有限公司",
+        "tax_id":  "86964593",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A009",
+        "short_name":  "菖益",
+        "full_name":  "菖益廢棄物有限公司",
+        "tax_id":  "12714973",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A010",
+        "short_name":  "昌立",
+        "full_name":  "昌立環保有限公司",
+        "tax_id":  "25089065",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A011",
+        "short_name":  "寶合良",
+        "full_name":  "寶合良企業有限公司",
+        "tax_id":  "27836025",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A012",
+        "short_name":  "鍊金寶",
+        "full_name":  "鍊金寶有限公司",
+        "tax_id":  "16222387",
+        "in_scope":  true,
+        "report_name":  "鍊金寶"
+    },
+    {
+        "code":  "A013",
+        "short_name":  "資立通",
+        "full_name":  "資立通環境工程有限公司",
+        "tax_id":  "70458655",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A014",
+        "short_name":  "九穎",
+        "full_name":  "九穎資源科技股份有限公司",
+        "tax_id":  "27981343",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A015",
+        "short_name":  "城林",
+        "full_name":  "城林環保有限公司",
+        "tax_id":  "27461737",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A016",
+        "short_name":  "宏田",
+        "full_name":  "宏田環保有限公司",
+        "tax_id":  "80082833",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A017",
+        "short_name":  "三九",
+        "full_name":  "三九企業有限公司",
+        "tax_id":  "16348317",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A018",
+        "short_name":  "進勇",
+        "full_name":  "進勇企業社",
+        "tax_id":  "17451730",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A019",
+        "short_name":  "上大",
+        "full_name":  "上大企業有限公司",
+        "tax_id":  "54282370",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A020",
+        "short_name":  "全力",
+        "full_name":  "全力資源有限公司",
+        "tax_id":  "53429777",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A021",
+        "short_name":  "安信",
+        "full_name":  "安信開發環保有限公司",
+        "tax_id":  "54313922",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A023",
+        "short_name":  "根土(停業",
+        "full_name":  "根土有限公司",
+        "tax_id":  "23256524",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A024",
+        "short_name":  "鑫康",
+        "full_name":  "鑫康環境工程有限公司",
+        "tax_id":  "89844453",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A025",
+        "short_name":  "綠芳",
+        "full_name":  "綠芳環境工程股份有限公司",
+        "tax_id":  "86954878",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A026",
+        "short_name":  "澤安",
+        "full_name":  "澤安有限公司",
+        "tax_id":  "84436979",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A027",
+        "short_name":  "呈泓",
+        "full_name":  "呈泓興業有限公司",
+        "tax_id":  "23091713",
+        "in_scope":  true,
+        "report_name":  "呈泓興業"
+    },
+    {
+        "code":  "A028",
+        "short_name":  "享展",
+        "full_name":  "享展工業有限公司",
+        "tax_id":  "28399727",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A029",
+        "short_name":  "德利",
+        "full_name":  "德利創新有限公司",
+        "tax_id":  "24293131",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A030",
+        "short_name":  "宏和",
+        "full_name":  "宏和創新有限公司",
+        "tax_id":  "54127379",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A031",
+        "short_name":  "吉康(停用)",
+        "full_name":  "吉康環境工程有限公司",
+        "tax_id":  "89844453",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A032",
+        "short_name":  "發彩",
+        "full_name":  "發彩環保工程有限公司",
+        "tax_id":  "16264288",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A033",
+        "short_name":  "裕益行",
+        "full_name":  "裕益行企業社",
+        "tax_id":  "10042465",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A034",
+        "short_name":  "榮廣(停用)",
+        "full_name":  "榮廣資源回收有限公司",
+        "tax_id":  "49735866",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A035",
+        "short_name":  "普誠-台中",
+        "full_name":  "普誠環保工程有限公司-台中分公司",
+        "tax_id":  "13011120",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A036",
+        "short_name":  "溙安",
+        "full_name":  "溙安廢棄物清除股份有限公司",
+        "tax_id":  "84209192",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A037",
+        "short_name":  "泗泰",
+        "full_name":  "泗泰企業有限公司",
+        "tax_id":  "86773551",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A038",
+        "short_name":  "派詮",
+        "full_name":  "派詮有限公司",
+        "tax_id":  "28083516",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A039",
+        "short_name":  "侑享",
+        "full_name":  "侑享股份有限公司",
+        "tax_id":  "28508555",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A040",
+        "short_name":  "寶特",
+        "full_name":  "寶特企業有限公司",
+        "tax_id":  "86666270",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A041",
+        "short_name":  "協成",
+        "full_name":  "協成塑膠廢料行",
+        "tax_id":  "55693907",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A042",
+        "short_name":  "資生寶",
+        "full_name":  "資生寶企業社",
+        "tax_id":  "84023436",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A043",
+        "short_name":  "亦程",
+        "full_name":  "亦程有限公司",
+        "tax_id":  "25198280",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A044",
+        "short_name":  "志桀",
+        "full_name":  "志桀企業社",
+        "tax_id":  "39945076",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A046",
+        "short_name":  "祥棧",
+        "full_name":  "祥棧有限公司",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A047",
+        "short_name":  "瑞昇",
+        "full_name":  "瑞昇資源再生有限公司",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A048",
+        "short_name":  "全毅",
+        "full_name":  "全毅企業社",
+        "tax_id":  "67863906",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A049",
+        "short_name":  "回淨",
+        "full_name":  "回淨有限公司",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A050",
+        "short_name":  "協治塑膠",
+        "full_name":  "協治塑膠工業股份有限公司",
+        "tax_id":  "24370811",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A051",
+        "short_name":  "協治(志澄)",
+        "full_name":  "協治企業股份有限公司(志澄企業有限公司)",
+        "tax_id":  "25095947",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A052",
+        "short_name":  "協治改A080",
+        "full_name":  "協治企業有限公司(停用_改A080)",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A053",
+        "short_name":  "協昌",
+        "full_name":  "協昌環保實業有限公司",
+        "tax_id":  "27516536",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A054",
+        "short_name":  "鄉土",
+        "full_name":  "鄉土資源回收有限公司",
+        "tax_id":  "80550033",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A055",
+        "short_name":  "鄉鑫",
+        "full_name":  "鄉鑫資源回收有限公司",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A056",
+        "short_name":  "寶瑩",
+        "full_name":  "寶瑩實業社",
+        "tax_id":  "10836628",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A057",
+        "short_name":  "聯福",
+        "full_name":  "聯福資源科技有限公司",
+        "tax_id":  "54198922",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A058",
+        "short_name":  "鑫承",
+        "full_name":  "鑫承環保企業股份有限公司",
+        "tax_id":  "70720782",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A059",
+        "short_name":  "群晉",
+        "full_name":  "群晉有限公司",
+        "tax_id":  "25054642",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A060",
+        "short_name":  "美潔",
+        "full_name":  "美潔環保企業股份有限公司",
+        "tax_id":  "89436787",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A061",
+        "short_name":  "辰野",
+        "full_name":  "辰野企業有限公司",
+        "tax_id":  "",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A062",
+        "short_name":  "昇葆",
+        "full_name":  "昇葆環保股份有限公司",
+        "tax_id":  "53269737",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A063",
+        "short_name":  "建鋐",
+        "full_name":  "建鋐環保科技有限公司",
+        "tax_id":  "16971683",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A064",
+        "short_name":  "直復",
+        "full_name":  "直復環保有限公司",
+        "tax_id":  "28870794",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A065",
+        "short_name":  "家昇",
+        "full_name":  "家昇資源回收有限公司",
+        "tax_id":  "70653382",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A066",
+        "short_name":  "嘉鴻",
+        "full_name":  "嘉鴻資源回收有限公司",
+        "tax_id":  "54795391",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A067",
+        "short_name":  "營珈",
+        "full_name":  "營珈有限公司",
+        "tax_id":  "13141469",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A068",
+        "short_name":  "大愛",
+        "full_name":  "大愛資源回收有限公司",
+        "tax_id":  "28509436",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A069",
+        "short_name":  "宥昇",
+        "full_name":  "宥昇環保有限公司",
+        "tax_id":  "53631857",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A070",
+        "short_name":  "沅逢",
+        "full_name":  "沅逢有限公司",
+        "tax_id":  "65731205",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A071",
+        "short_name":  "彰聯環保",
+        "full_name":  "彰聯環保有限公司",
+        "tax_id":  "16989311",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A072",
+        "short_name":  "東昇塑膠",
+        "full_name":  "東昇塑膠有限公司",
+        "tax_id":  "70608599",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A073",
+        "short_name":  "根福",
+        "full_name":  "根福資源回收有限公司",
+        "tax_id":  "25073417",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A074",
+        "short_name":  "榮廣實業",
+        "full_name":  "榮廣實業有限公司",
+        "tax_id":  "49735866",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A075",
+        "short_name":  "和健",
+        "full_name":  "和健廢棄物資源回收企業有限公司",
+        "tax_id":  "89376606",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A076",
+        "short_name":  "昌禾",
+        "full_name":  "昌禾環保工程有限公司",
+        "tax_id":  "12852813",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A077",
+        "short_name":  "祐嘉",
+        "full_name":  "祐嘉興業有限公司",
+        "tax_id":  "70617400",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A078",
+        "short_name":  "利多山",
+        "full_name":  "利多山資源回收有限公司",
+        "tax_id":  "28643975",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A079",
+        "short_name":  "金祥達",
+        "full_name":  "金祥達企業有限公司",
+        "tax_id":  "69385450",
+        "in_scope":  true,
+        "report_name":  "金祥達"
+    },
+    {
+        "code":  "A080",
+        "short_name":  "協治(屏東)",
+        "full_name":  "協治企業股份有限公司",
+        "tax_id":  "23109571",
+        "in_scope":  true,
+        "report_name":  "協治企業"
+    },
+    {
+        "code":  "A081",
+        "short_name":  "中安廢棄物",
+        "full_name":  "中安廢棄物處理股份有限公司",
+        "tax_id":  "86908489",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A082",
+        "short_name":  "長宏",
+        "full_name":  "長宏資源回收企業社",
+        "tax_id":  "25371128",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A083",
+        "short_name":  "森翔",
+        "full_name":  "森翔有限公司",
+        "tax_id":  "27478982",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A084",
+        "short_name":  "淦麒",
+        "full_name":  "淦麒企業有限公司",
+        "tax_id":  "54956375",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A085",
+        "short_name":  "容冠",
+        "full_name":  "容冠環保有限公司",
+        "tax_id":  "28495263",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A086",
+        "short_name":  "豐益",
+        "full_name":  "豐益商行",
+        "tax_id":  "6605771",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A087",
+        "short_name":  "大豐",
+        "full_name":  "大豐環保科技股份有限公司",
+        "tax_id":  "27590900",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A088",
+        "short_name":  "大福和",
+        "full_name":  "大福和資源再生股份有限公司",
+        "tax_id":  "28775671",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A089",
+        "short_name":  "森鉅",
+        "full_name":  "森鉅科技材料股份有限公司",
+        "tax_id":  "89845559",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A090",
+        "short_name":  "金合聚",
+        "full_name":  "金合聚股份有限公司",
+        "tax_id":  "16526086",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A091",
+        "short_name":  "祥聚",
+        "full_name":  "祥聚有限公司(金合聚)",
+        "tax_id":  "28092819",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A092",
+        "short_name":  "泉發環保",
+        "full_name":  "泉發環保有限公司",
+        "tax_id":  "25042772",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A093",
+        "short_name":  "狀元",
+        "full_name":  "狀元能源科技有限公司",
+        "tax_id":  "66550477",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A094",
+        "short_name":  "寅成",
+        "full_name":  "寅成有限公司",
+        "tax_id":  "28379530",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A095",
+        "short_name":  "永溢",
+        "full_name":  "永溢環保科技有限公司",
+        "tax_id":  "80567203",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A096",
+        "short_name":  "統億",
+        "full_name":  "統億資源回收有限公司",
+        "tax_id":  "84166264",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A097",
+        "short_name":  "宗淶",
+        "full_name":  "宗淶企業社",
+        "tax_id":  "77074508",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A098",
+        "short_name":  "順達",
+        "full_name":  "順達環保有限公司",
+        "tax_id":  "12649925",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A099",
+        "short_name":  "榮品",
+        "full_name":  "榮品環保科技有限公司",
+        "tax_id":  "24853892",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A100",
+        "short_name":  "大成環保",
+        "full_name":  "大成環保企業有限公司",
+        "tax_id":  "89353287",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A101",
+        "short_name":  "昌樂",
+        "full_name":  "昌樂企業社",
+        "tax_id":  "85148476",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A102",
+        "short_name":  "域誠",
+        "full_name":  "域誠環保科技股份有限公司",
+        "tax_id":  "50775605",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A103",
+        "short_name":  "福銓",
+        "full_name":  "福銓環保有限公司",
+        "tax_id":  "16923825",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A104",
+        "short_name":  "宜田",
+        "full_name":  "宜田資源回收企業社陳威志",
+        "tax_id":  "85335127",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A105",
+        "short_name":  "聯合",
+        "full_name":  "聯合資源有限公司",
+        "tax_id":  "53493989",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A106",
+        "short_name":  "聯吉",
+        "full_name":  "聯吉興業有限公司",
+        "tax_id":  "54501353",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A107",
+        "short_name":  "鈞城",
+        "full_name":  "鈞城企業有限公司",
+        "tax_id":  "70687643",
+        "in_scope":  true,
+        "report_name":  "鈞城"
+    },
+    {
+        "code":  "A108",
+        "short_name":  "辰泰資源",
+        "full_name":  "辰泰資源回收有限公司",
+        "tax_id":  "83283546",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A109",
+        "short_name":  "盛展",
+        "full_name":  "盛展企業股份有限公司",
+        "tax_id":  "54808656",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A110",
+        "short_name":  "貨殖企業",
+        "full_name":  "貨殖企業股份有限公司",
+        "tax_id":  "84094564",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A111",
+        "short_name":  "廣榮資源",
+        "full_name":  "廣榮資源回收有限公司",
+        "tax_id":  "89658703",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A112",
+        "short_name":  "鉅盛環保",
+        "full_name":  "鉅盛環保股份有限公司",
+        "tax_id":  "85001698",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A113",
+        "short_name":  "永茂企業社",
+        "full_name":  "永茂企業社",
+        "tax_id":  "26781395",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A114",
+        "short_name":  "龍澯環保工",
+        "full_name":  "龍澯環保工程行",
+        "tax_id":  "37754938",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A115",
+        "short_name":  "東大環保企",
+        "full_name":  "東大環保企業社",
+        "tax_id":  "26136185",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A116",
+        "short_name":  "達亨環保",
+        "full_name":  "達亨環保科技有限公司",
+        "tax_id":  "80723582",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A117",
+        "short_name":  "豐溢綠能",
+        "full_name":  "豐溢綠能材料股份有限公司",
+        "tax_id":  "90732456",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A118",
+        "short_name":  "榮輝環保",
+        "full_name":  "榮輝環保有限公司",
+        "tax_id":  "24429741",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A121",
+        "short_name":  "台灣瑞曼",
+        "full_name":  "台灣瑞曼迪斯股份有限公司",
+        "tax_id":  "23313428",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A122",
+        "short_name":  "沅佑",
+        "full_name":  "沅佑科技股份有限公司",
+        "tax_id":  "28806610",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A123",
+        "short_name":  "有志",
+        "full_name":  "有志環保有限公司",
+        "tax_id":  "53617980",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A124",
+        "short_name":  "科蝶",
+        "full_name":  "科蝶企業有限公司",
+        "tax_id":  "24256564",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A125",
+        "short_name":  "上貿",
+        "full_name":  "上貿環保工程有限公司",
+        "tax_id":  "89564924",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A126",
+        "short_name":  "合維",
+        "full_name":  "合維股份有限公司",
+        "tax_id":  "96892036",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A127",
+        "short_name":  "碩瑋",
+        "full_name":  "碩瑋企業有限公司",
+        "tax_id":  "86953322",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A128",
+        "short_name":  "興福",
+        "full_name":  "興福企業社",
+        "tax_id":  "49930122",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A129",
+        "short_name":  "潔安",
+        "full_name":  "潔安環保工程有限公司",
+        "tax_id":  "89903831",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A130",
+        "short_name":  "源坤",
+        "full_name":  "源坤企業有限公司",
+        "tax_id":  "86951324",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A131",
+        "short_name":  "堅貞",
+        "full_name":  "堅貞企業有限公司",
+        "tax_id":  "12754833",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A132",
+        "short_name":  "駿雅",
+        "full_name":  "駿雅環保實業股份有限公司",
+        "tax_id":  "93619247",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A133",
+        "short_name":  "寶鴻",
+        "full_name":  "寶鴻環保有限公司",
+        "tax_id":  "80035500",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A134",
+        "short_name":  "凡立橙",
+        "full_name":  "凡立橙股份有限公司",
+        "tax_id":  "64873183",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A135",
+        "short_name":  "三珈企業",
+        "full_name":  "三珈企業股份有限公司",
+        "tax_id":  "22923598",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A136",
+        "short_name":  "文全企業社",
+        "full_name":  "文全企業社",
+        "tax_id":  "70887797",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A137",
+        "short_name":  "統立環保",
+        "full_name":  "統立環保工程有限公司",
+        "tax_id":  "89513290",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A138",
+        "short_name":  "全鋐",
+        "full_name":  "全鋐企業社",
+        "tax_id":  "72599759",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A139",
+        "short_name":  "竣宏塑膠",
+        "full_name":  "竣宏塑膠有限公司",
+        "tax_id":  "83619275",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A140",
+        "short_name":  "臻宏環保",
+        "full_name":  "臻宏環保有限公司",
+        "tax_id":  "90026179",
+        "in_scope":  false,
+        "report_name":  null
+    },
+    {
+        "code":  "A141",
+        "short_name":  "廣富",
+        "full_name":  "廣富綠能股份有限公司",
+        "tax_id":  "84094564",
+        "in_scope":  true,
+        "report_name":  null
+    },
+    {
+        "code":  "A142",
+        "short_name":  "廣銓",
+        "full_name":  "廣銓環保科技有限公司",
+        "tax_id":  "24845009",
+        "in_scope":  false,
+        "report_name":  null
+    }
+]

@@ -128,7 +128,7 @@ async function createLocalDb() {
 // 正式模式（Supabase）
 // ======================================================================
 async function createSupabaseDb() {
-  const sb = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+  const sb = window.supabase.createClient(String(APP_CONFIG.SUPABASE_URL).trim().replace(/^(https?:\/\/[^/]+).*$/i, '$1'),APP_CONFIG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
   const OUTBOX = 'ipwa:outbox';
   const getBox = () => { try { return JSON.parse(localStorage.getItem(OUTBOX)) || []; } catch { return []; } };
   const setBox = (b) => localStorage.setItem(OUTBOX, JSON.stringify(b));
