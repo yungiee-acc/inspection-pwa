@@ -39,7 +39,7 @@ export function buildReportModel({ model, vendors, weighDate }) {
         const text = [types, insp.note].filter(Boolean).join('；');
         p += text;
         sample = {
-          code: String(insp.sample_code), gross: fmtSampleGross(insp.gross_kg),
+          code: String(insp.sample_code ?? ''), gross: fmtSampleGross(insp.gross_kg),
           water: Number(insp.water_kg || 0) === 0 ? '-' : fmt2(insp.water_kg),
           impurity: fmt2(insp.impurity_kg || 0),
         };

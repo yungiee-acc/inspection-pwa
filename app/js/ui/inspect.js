@@ -63,14 +63,13 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
     <select name="erp_code"><option value="">請選擇品項</option>${erpItems.map((i) => `<option value="${esc(i.code)}">${esc(erpLabel(i))}</option>`).join('')}</select>
     <div class="hint" id="erphint"></div><div class="fe" data-e="erp_code"></div>
 
-    <label>樣磚代號 <span class="req">*</span></label><input name="sample_code" value="${esc(f.sample_code)}" inputmode="text" placeholder="例：521">
+    <label>樣磚代號 <span class="opt">（可先空白，產生報告前須補填）</span></label><input name="sample_code" value="${esc(f.sample_code)}" inputmode="text" placeholder="例：521">
     <div class="fe" data-e="sample_code"></div>
 
     <div class="row2">
       <div><label>樣磚毛重 kg <span class="req">*</span></label><input name="gross_kg" value="${esc(f.gross_kg)}" inputmode="decimal" placeholder="例：512.5"><div class="fe" data-e="gross_kg"></div><div class="fw" data-w="gross_kg"></div></div>
       <div><label>含水重 kg <span class="opt">（無則留空）</span></label><input name="water_kg" value="${esc(f.water_kg)}" inputmode="decimal"><div class="fe" data-e="water_kg"></div><div class="fw" data-w="water_kg"></div></div>
       <div><label>雜質重 kg <span class="opt">（無則留空）</span></label><input name="impurity_kg" value="${esc(f.impurity_kg)}" inputmode="decimal"><div class="fe" data-e="impurity_kg"></div><div class="fw" data-w="impurity_kg"></div></div>
-      <div><label>鐵絲重 kg <span class="opt">（如適用）</span></label><input name="wire_kg" value="${esc(f.wire_kg)}" inputmode="decimal"><div class="fe" data-e="wire_kg"></div><div class="fw" data-w="wire_kg"></div></div>
     </div>
 
     <label>雜質種類 <span class="opt">（可複選；會印在報告「雜質/備註」欄）</span></label>
@@ -88,7 +87,7 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
 
   const q = (n) => $(`[name="${n}"]`, root);
   q('erp_code').value = f.erp_code;
-  const sync = () => { for (const n of ['inspected_at', 'vehicle_no', 'erp_code', 'sample_code', 'gross_kg', 'water_kg', 'impurity_kg', 'wire_kg', 'inspector_name', 'note']) f[n] = q(n).value; };
+  const sync = () => { for (const n of ['inspected_at', 'vehicle_no', 'erp_code', 'sample_code', 'gross_kg', 'water_kg', 'impurity_kg', 'inspector_name', 'note']) f[n] = q(n).value; };
 
   // --- 廠商搜尋下拉
   const vq = q('vq'), dd = $('.dd', root);
@@ -265,7 +264,7 @@ export async function openDetail(app, i, onChange) {
     m.el.innerHTML = `<h3>查驗 ${esc(i.inspection_id)} ${i.status === 'void' ? badge('已作廢', 'r') : ''}${i.locked ? badge('已鎖定', 'b') : ''}</h3>
       <dl class="kv"><dt>時間</dt><dd>${esc(fmtDateTime(i.inspected_at))}</dd><dt>廠商</dt><dd>${esc(i.vendor_code)} ${esc(i.vendor_name || '')}</dd><dt>車號</dt><dd>${esc(i.vehicle_no)}</dd>
       <dt>品項</dt><dd>${esc(i.erp_code)} ${esc(erp?.name || '')}<br><span class="muted small">報告名稱：${esc(erp?.report_name || '（尚未對照）')}</span></dd>
-      <dt>樣磚</dt><dd>${esc(i.sample_code)}</dd><dt>重量(kg)</dt><dd>毛重 ${i.gross_kg}｜含水 ${i.water_kg ?? 0}｜雜質 ${i.impurity_kg ?? 0}｜鐵絲 ${i.wire_kg ?? 0}</dd>
+      <dt>樣磚</dt><dd>${esc(i.sample_code)}</dd><dt>重量(kg)</dt><dd>毛重 ${i.gross_kg}｜含水 ${i.water_kg ?? 0}｜雜質 ${i.impurity_kg ?? 0}</dd>
       <dt>雜質種類</dt><dd>${esc((i.impurity_types || []).join('、') || '—')}</dd><dt>檢驗人</dt><dd>${esc(i.inspector_name)}</dd><dt>備註</dt><dd>${esc(i.note || '—')}</dd><dt>版次</dt><dd>${i.rev}</dd></dl>
       <div class="actions">${canEdit(app, i) ? '<button id="ed">編輯／更正</button>' : ''}<button class="sec" id="cl">關閉</button></div>
       ${i.locked && !can(app, 'admin') ? '<p class="small muted">此筆已納入已審核報告，需管理員解鎖後才能更正。</p>' : ''}

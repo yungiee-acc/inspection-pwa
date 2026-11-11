@@ -13,7 +13,7 @@ export function validateInspection(f, ctx) {
   if (!String(f.vehicle_no || '').trim()) E('vehicle_no', '請填車號');
   if (!f.erp_code) E('erp_code', '請選擇抽驗品項');
   else if (!ctx.erpItems.find((i) => i.code === f.erp_code)) E('erp_code', '品號不在 ERP 主檔內');
-  if (!String(f.sample_code || '').trim()) E('sample_code', '請填樣磚代號');
+  // 樣磚代號：現場可先不填，產生報告前必須補齊（見 match.js 的 NO_SAMPLE_CODE）
   if (!String(f.inspector_name || '').trim()) E('inspector_name', '請填檢驗人');
 
   const gross = num(f.gross_kg);

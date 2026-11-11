@@ -16,6 +16,10 @@ label{display:block;font-weight:600;margin:12px 0 4px}
 label .req{color:var(--er)}label .opt{font-weight:400;color:var(--mu);font-size:13px}
 input,select,textarea{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;background:#fff;color:var(--tx);min-height:46px}
 textarea{min-height:72px}
+input,select,textarea{box-sizing:border-box;max-width:100%;min-width:0}
+/* iOS Safari：日期時間欄位有內建最小寬度，會超出框外 */
+input[type=datetime-local],input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;text-align:left}
+input[type=datetime-local]::-webkit-date-and-time-value{text-align:left;min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--g);outline-offset:-1px}
 input.bad,select.bad,textarea.bad,.combo.bad input{border-color:var(--er);background:var(--er2)}
 .fe{color:var(--er);font-size:13px;margin-top:3px}.fw{color:var(--wa);font-size:13px;margin-top:3px}.hint{color:var(--mu);font-size:13px;margin-top:3px}

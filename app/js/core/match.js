@@ -172,6 +172,7 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
       if (r.state === 'exception') blockers.push({ code: 'EXCEPTION', msg: `${where}：配對異常，需人工選擇` });
       if (r.state === 'stale') blockers.push({ code: 'STALE', msg: `${where}：${r.reasons[0].msg}` });
       if (r.state === 'conflict') blockers.push({ code: 'CONFLICT', msg: `${where}：同一筆查驗重複確認` });
+      if (r.state === 'confirmed' && !String(r.confirmed?.raw?.sample_code ?? '').trim()) blockers.push({ code: 'NO_SAMPLE_CODE', msg: `${where}：查驗 ${r.confirmed.id} 尚未填樣磚代號，請到「查驗紀錄」補填後重新確認` });
       if (r.flags.some((f) => f.code === 'UNKNOWN_ITEM' && f.level === 'block')) blockers.push({ code: 'UNKNOWN_ITEM', msg: `${where}：品項名稱不在 ERP D 欄清單，需管理員確認` });
     }
   }
