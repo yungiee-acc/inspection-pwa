@@ -36,12 +36,18 @@ async function createLocalDb() {
 
     async loadMasters() {
       const erpItems = erp0.map((i) => ({ ...i, ...(S.erp_edit[i.code] || {}) }));
-      const vendors = ven0.map((v) => ({ ...v, ...(S.vendor_edit[v.code] || {}) }));
+      const vendors = [...ven0, ...(S.vendor_new || [])].map((v) => ({ ...v, ...(S.vendor_edit[v.code] || {}) })).sort((a, b) => a.code.localeCompare(b.code));
       return { erpItems, vendors };
     },
     async setErpReportName(code, name) { needRole(['admin']); const o = S.erp_edit[code]?.report_name ?? erp0.find((i) => i.code === code)?.report_name; S.erp_edit[code] = { report_name: name || null }; audit('erp_items', code, 'update', { report_name: o }, { report_name: name || null }); persist(); },
     async setVendorReportName(code, name) { needRole(['admin']); const o = S.vendor_edit[code]?.report_name ?? ven0.find((v) => v.code === code)?.report_name; S.vendor_edit[code] = { ...(S.vendor_edit[code] || {}), report_name: name || null }; audit('vendors', code, 'update', { report_name: o }, { report_name: name || null }); persist(); },
     async setVendorInScope(code, v) { needRole(['admin']); S.vendor_edit[code] = { ...(S.vendor_edit[code] || {}), in_scope: !!v }; persist(); },
+    async addVendor(v) {
+      needRole(['admin']);
+      S.vendor_new ||= [];
+      if (ven0.some((x) => x.code === v.code) || S.vendor_new.some((x) => x.code === v.code)) throw new Error(`廠商代號 ${v.code} 已存在`);
+      S.vendor_new.push({ tax_id: null, ...v }); audit('vendors', v.code, 'insert', null, v); persist();
+    },
 
     async listInspections({ from, to } = {}) {
       return S.inspections.filter((i) => (!from || i.inspected_at >= from) && (!to || i.inspected_at < to)).sort((a, b) => b.inspected_at.localeCompare(a.inspected_at));
@@ -158,6 +164,7 @@ async function createSupabaseDb() {
     async setErpReportName(code, name) { must(await sb.from('erp_items').update({ report_name: name || null }).eq('code', code)); },
     async setVendorReportName(code, name) { must(await sb.from('vendors').update({ report_name: name || null }).eq('code', code)); },
     async setVendorInScope(code, v) { must(await sb.from('vendors').update({ in_scope: !!v }).eq('code', code)); },
+    async addVendor(v) { must(await sb.from('vendors').insert({ code: v.code, short_name: v.short_name, full_name: v.full_name, report_name: v.report_name || null, in_scope: !!v.in_scope })); },
 
     async listInspections({ from, to } = {}) {
       let q = sb.from('inspections').select('*').order('inspected_at', { ascending: false }).limit(2000);

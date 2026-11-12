@@ -39,7 +39,7 @@ export async function renderAdmin(app, host) {
       $('#vs', tb).oninput = paint; paint();
     } else if (tab === 'xl') {
       tb.innerHTML = `<div class="card info small"><b>用 Excel 一次維護「廠商」與「品項對照」</b><ol style="margin:6px 0 0 18px;padding:0"><li>按「匯出 Excel」下載目前清單。</li><li>只改三種欄位：<b>報告顯示名稱</b>、<b>納入手機選單</b>（Y／空白）、<b>報告D欄名稱</b>。標示「唯讀」的欄位與代號不要動。</li><li>回來按「匯入 Excel」，系統會先列出差異，你確認後才套用。</li></ol>
-        <p style="margin:6px 0 0">有任何一列錯誤，整檔都不會套用。檔案裡沒有出現的廠商／品項不會被改動。ERP 品號與品名仍以 ERP 主檔為準，無法在這裡新增。</p></div>
+        <p style="margin:6px 0 0">有任何一列錯誤，整檔都不會套用。檔案裡沒有出現的廠商／品項不會被改動。<b>新增廠商</b>：在「廠商」工作表最下面加一列，填代號、簡稱、全名（全名要與環資 Excel 的廠商名稱一字不差）。ERP 品號與品名仍以 ERP 主檔為準，無法在這裡新增。</p></div>
         <div class="card"><div class="actions"><button id="xe">匯出 Excel</button><button class="sec" id="xi">匯入 Excel…</button></div><input type="file" id="xf" accept=".xlsx,.xls" style="display:none"><div id="xr"></div></div>`;
       $('#xe', tb).onclick = async () => {
         try {

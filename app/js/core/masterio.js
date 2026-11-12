@@ -7,7 +7,7 @@
 
 export const SHEET_VENDOR = '廠商';
 export const SHEET_ERP = '品項對照';
-const VEN_HEAD = ['廠商代號', '廠商簡稱(唯讀)', '廠商全名(唯讀)', '報告顯示名稱', '納入手機選單(Y/空白)'];
+const VEN_HEAD = ['廠商代號', '廠商簡稱(既有唯讀)', '廠商全名(既有唯讀)', '報告顯示名稱', '納入手機選單(Y/空白)'];
 const ERP_HEAD = ['ERP品號', 'ERP品名(唯讀)', '單位(唯讀)', '報告D欄名稱'];
 
 const T = (v) => (v == null ? '' : String(v).replace(/　/g, ' ').trim());
@@ -22,7 +22,7 @@ export function buildExportAoa(masters) {
     [''],
     ['使用方式'],
     ['1. 只修改「報告顯示名稱」「納入手機選單」「報告D欄名稱」三種欄位。標示「唯讀」的欄位請勿修改（僅供對照，改了會被視為拿錯檔）。'],
-    ['2. 不要新增、刪除、重新排序「廠商代號」「ERP品號」；新增品號請先更新 ERP 品號主檔。'],
+    ['2. 「ERP品號」不能新增（請先更新 ERP 品號主檔）。「廠商」可以新增：在廠商工作表最下面新增一列，填「廠商代號、廠商簡稱、廠商全名」（全名必須與環資 Excel 的廠商名稱一字不差），其餘欄位視需要填。既有廠商的代號、簡稱、全名請勿修改。'],
     ['3. 「納入手機選單」填 Y（或 是、1）代表納入；空白代表不納入。'],
     ['4. 「報告顯示名稱」留空＝使用廠商簡稱。'],
     ['5. 「報告D欄名稱」不可在這裡清空（要清空請到管理畫面操作）。'],
@@ -92,7 +92,22 @@ export function parseMasterImport(buf, XLSX, masters) {
         if (seen.has(code)) { err(SHEET_VENDOR, row, `廠商代號 ${code} 在檔案中重複出現`); return; }
         seen.add(code);
         const v = vMap.get(code);
-        if (!v) { err(SHEET_VENDOR, row, `廠商代號 ${code} 不在廠商主檔（不能在這裡新增廠商）`); return; }
+        if (!v) {
+          // 新增廠商：代號、簡稱、全名都要填。全名是與環資比對的依據，必須與環資 Excel 的廠商名稱一字不差
+          const sn = ix['廠商簡稱'] >= 0 ? T(r[ix['廠商簡稱']]) : '';
+          const fn = ix['廠商全名'] >= 0 ? T(r[ix['廠商全名']]) : '';
+          if (!sn || !fn) { err(SHEET_VENDOR, row, `廠商代號 ${code} 不在廠商主檔。若要新增廠商，請同時填「廠商簡稱」與「廠商全名」；若只是代號打錯請修正`); return; }
+          if (/\s/.test(code)) { err(SHEET_VENDOR, row, `廠商代號「${code}」不可含空白`); return; }
+          const dupName = masters.vendors.find((x) => x.full_name.replace(/\s/g, '') === fn.replace(/\s/g, '')) || changes.find((c) => c.kind === 'vendor_add' && c.full_name.replace(/\s/g, '') === fn.replace(/\s/g, ''));
+          if (dupName) { err(SHEET_VENDOR, row, `新增廠商 ${code} 的全名「${fn}」與既有廠商（${dupName.code}）相同；全名必須唯一，否則環資無法配對`); return; }
+          const nm = T(r[ix['報告顯示名稱']]);
+          const fg = T(r[ix['納入手機選單']]).toLowerCase();
+          if (!YES.has(fg) && !NO.has(fg)) { err(SHEET_VENDOR, row, `${code}「納入手機選單」的值「${fg}」看不懂，請填 Y 或留空`); return; }
+          if (!/^[A-Za-z]\d{3}$/.test(code)) warn(SHEET_VENDOR, row, `新增廠商代號「${code}」不是常見格式（英文字母＋3 位數字），請確認`);
+          warn(SHEET_VENDOR, row, `新增廠商 ${code}：全名「${fn}」必須與環資 Excel 上的廠商名稱一字不差，否則配對不到`);
+          changes.push({ kind: 'vendor_add', code, label: `${code} ${sn}｜新增廠商`, old: '（新廠商）', new: `${sn}｜${fn}${nm ? `｜顯示名稱 ${nm}` : ''}${YES.has(fg) ? '｜納入手機選單' : ''}`, short_name: sn, full_name: fn, report_name: nm, in_scope: YES.has(fg) });
+          return;
+        }
         if (ix['廠商全名'] >= 0 && T(r[ix['廠商全名']]) && T(r[ix['廠商全名']]) !== T(v.full_name)) { err(SHEET_VENDOR, row, `${code} 的廠商全名與系統不符（檔案「${T(r[ix['廠商全名']])}」／系統「${v.full_name}」），可能是舊檔或改到唯讀欄，請重新匯出`); return; }
         const newName = T(r[ix['報告顯示名稱']]);
         const flagRaw = T(r[ix['納入手機選單']]).toLowerCase();
@@ -141,7 +156,8 @@ export async function applyMasterChanges(db, changes) {
   let done = 0; const failed = [];
   for (const c of changes) {
     try {
-      if (c.kind === 'vendor_report_name') await db.setVendorReportName(c.code, c.new);
+      if (c.kind === 'vendor_add') await db.addVendor({ code: c.code, short_name: c.short_name, full_name: c.full_name, report_name: c.report_name || null, in_scope: !!c.in_scope });
+      else if (c.kind === 'vendor_report_name') await db.setVendorReportName(c.code, c.new);
       else if (c.kind === 'vendor_in_scope') await db.setVendorInScope(c.code, c.new === 'Y');
       else if (c.kind === 'erp_report_name') await db.setErpReportName(c.code, c.new);
       done++;
