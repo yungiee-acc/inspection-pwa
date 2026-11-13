@@ -3,6 +3,7 @@
 //  - createLocalDb   ：示範模式（只存在本機瀏覽器，僅供試用）
 import { APP_CONFIG } from './app-config.js';
 import { nowIso, uuid } from './core/util.js';
+import { defaultImpurityTypes } from './core/impurity.js';
 
 const LS = 'ipwa:v1';
 
@@ -37,7 +38,25 @@ async function createLocalDb() {
     async loadMasters() {
       const erpItems = erp0.map((i) => ({ ...i, ...(S.erp_edit[i.code] || {}) }));
       const vendors = [...ven0, ...(S.vendor_new || [])].map((v) => ({ ...v, ...(S.vendor_edit[v.code] || {}) })).sort((a, b) => a.code.localeCompare(b.code));
-      return { erpItems, vendors };
+      S.imp_types ||= defaultImpurityTypes();
+      return { erpItems, vendors, impurityTypes: S.imp_types.map((t) => ({ ...t })) };
+    },
+    async addImpurityType(name) {
+      needRole(['admin']);
+      S.imp_types ||= defaultImpurityTypes();
+      if (S.imp_types.some((t) => t.name.toLowerCase() === name.toLowerCase())) throw new Error(`「${name}」已存在`);
+      const row = { name, sort_order: Math.max(0, ...S.imp_types.map((t) => t.sort_order)) + 10, active: true };
+      S.imp_types.push(row); audit('impurity_types', name, 'insert', null, row); persist();
+    },
+    async setImpurityActive(name, active) {
+      needRole(['admin']); S.imp_types ||= defaultImpurityTypes();
+      const t = S.imp_types.find((x) => x.name === name); if (!t) throw new Error('找不到這個種類');
+      audit('impurity_types', name, 'update', { active: t.active }, { active: !!active }); t.active = !!active; persist();
+    },
+    async setImpuritySort(name, sort_order) {
+      needRole(['admin']); S.imp_types ||= defaultImpurityTypes();
+      const t = S.imp_types.find((x) => x.name === name); if (!t) throw new Error('找不到這個種類');
+      t.sort_order = sort_order; persist();
     },
     async setErpReportName(code, name) { needRole(['admin']); const o = S.erp_edit[code]?.report_name ?? erp0.find((i) => i.code === code)?.report_name; S.erp_edit[code] = { report_name: name || null }; audit('erp_items', code, 'update', { report_name: o }, { report_name: name || null }); persist(); },
     async setVendorReportName(code, name) { needRole(['admin']); const o = S.vendor_edit[code]?.report_name ?? ven0.find((v) => v.code === code)?.report_name; S.vendor_edit[code] = { ...(S.vendor_edit[code] || {}), report_name: name || null }; audit('vendors', code, 'update', { report_name: o }, { report_name: name || null }); persist(); },
@@ -156,11 +175,19 @@ async function createSupabaseDb() {
     async signOut() { await sb.auth.signOut(); profile = null; },
 
     async loadMasters() {
-      const [erpItems, vendors] = await Promise.all([
+      const [erpItems, vendors, impurityTypes] = await Promise.all([
         sb.from('erp_items').select('*').order('code').then(must),
-        sb.from('vendors').select('*').order('code').then(must)]);
-      return { erpItems, vendors };
+        sb.from('vendors').select('*').order('code').then(must),
+        // 雜質種類表若還沒建立（尚未執行 patch_impurity_types.sql），退回預設清單，不影響其他功能
+        sb.from('impurity_types').select('*').order('sort_order').then(must).catch(() => null)]);
+      return { erpItems, vendors, impurityTypes: impurityTypes || defaultImpurityTypes(), impurityTypesFallback: !impurityTypes };
     },
+    async addImpurityType(name) {
+      const { data } = await sb.from('impurity_types').select('sort_order').order('sort_order', { ascending: false }).limit(1);
+      must(await sb.from('impurity_types').insert({ name, sort_order: (data?.[0]?.sort_order ?? 0) + 10, active: true }));
+    },
+    async setImpurityActive(name, active) { must(await sb.from('impurity_types').update({ active: !!active }).eq('name', name)); },
+    async setImpuritySort(name, sort_order) { must(await sb.from('impurity_types').update({ sort_order }).eq('name', name)); },
     async setErpReportName(code, name) { must(await sb.from('erp_items').update({ report_name: name || null }).eq('code', code)); },
     async setVendorReportName(code, name) { must(await sb.from('vendors').update({ report_name: name || null }).eq('code', code)); },
     async setVendorInScope(code, v) { must(await sb.from('vendors').update({ in_scope: !!v }).eq('code', code)); },

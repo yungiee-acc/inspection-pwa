@@ -36,7 +36,7 @@ export function buildReportModel({ model, vendors, weighDate }) {
       let sample = null;
       if (insp) {
         const types = (insp.impurity_types || []).join('、');
-        const text = [types, insp.note].filter(Boolean).join('；');
+        const text = [types, insp.note].filter(Boolean).join('、');
         p += text;
         sample = {
           code: String(insp.sample_code ?? ''), gross: fmtSampleGross(insp.gross_kg),

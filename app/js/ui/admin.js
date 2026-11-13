@@ -1,12 +1,13 @@
 // 管理員：品項對照名稱（ERP D 欄）、廠商報告顯示名稱、異動紀錄、備份
 import { $, $$, h, esc, toast, confirmBox, badge, download, loadXlsx } from './common.js';
 import { fmtDateTime } from '../core/util.js';
+import { sortedTypes, validateImpurityName } from '../core/impurity.js';
 import { buildExportWorkbook, parseMasterImport, applyMasterChanges } from '../core/masterio.js';
 
 export async function renderAdmin(app, host) {
   const view = h('<div></div>'); host.appendChild(view);
   let tab = 'erp';
-  const tabs = [['erp', '品項對照'], ['ven', '廠商'], ['xl', 'Excel 維護'],...(app.db.mode === 'supabase' ? [['usr', '使用者']] : []), ['audit', '異動紀錄'], ['sys', '備份／系統']];
+  const tabs = [['erp', '品項對照'], ['ven', '廠商'], ['xl', 'Excel 維護'], ['imp', '雜質種類'],...(app.db.mode === 'supabase' ? [['usr', '使用者']] : []), ['audit', '異動紀錄'], ['sys', '備份／系統']];
   view.innerHTML = `<h2>管理</h2><div class="tabs">${tabs.map(([k, l]) => `<button data-t="${k}" class="${k === tab ? 'on' : ''}">${l}</button>`).join('')}</div><div id="tb"></div>`;
   $$('[data-t]', view).forEach((b) => b.onclick = () => { tab = b.dataset.t; $$('[data-t]', view).forEach((x) => x.classList.toggle('on', x === b)); draw(); });
 
@@ -79,6 +80,30 @@ export async function renderAdmin(app, host) {
           };
         } catch (e) { box.innerHTML = `<div class="card err small">匯入失敗：${esc(e.message)}</div>`; }
       };
+    } else if (tab === 'imp') {
+      const list = sortedTypes(app.masters.impurityTypes || []);
+      tb.innerHTML = `<div class="card info small"><b>雜質種類</b>是手機「雜質種類」可複選的選項，選到的會用「、」連起來印在報告「雜質/備註」欄。<ul style="margin:6px 0 0 18px;padding:0"><li>可以<b>新增</b>、<b>停用</b>（停用後手機不再顯示，舊紀錄的文字保留）、<b>調整順序</b>。</li><li>不能改名或刪除：歷史查驗紀錄存的是文字，改名會讓舊資料對不上。打錯字請停用後重新新增。</li><li>名稱最多 20 字，不能含「、」「；」或逗號。</li></ul></div>
+        ${app.masters.impurityTypesFallback ? '<div class="card warn small"><b>⚠ 資料庫還沒有「雜質種類」表</b>，目前顯示的是內建預設清單，新增與停用都無法儲存。請先在 Supabase SQL Editor 執行 <code>supabase/patch_impurity_types.sql</code> 一次，再重新整理。</div>' : ''}
+        <div class="card"><label>新增種類</label><div style="display:flex;gap:8px"><input id="itn" maxlength="20" placeholder="例：鐵片"><button class="sm" id="ita">新增</button></div><div class="fe" id="ite"></div></div>
+        ${list.map((t, k) => `<div class="card ${t.active === false ? 'warn' : ''}" style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+          <div><b>${esc(t.name)}</b> ${t.active === false ? badge('已停用', 'y') : ''}</div>
+          <div style="display:flex;gap:6px"><button class="sm sec" data-up="${esc(t.name)}" ${k === 0 ? 'disabled' : ''}>↑</button><button class="sm sec" data-dn="${esc(t.name)}" ${k === list.length - 1 ? 'disabled' : ''}>↓</button><button class="sm ${t.active === false ? '' : 'sec'}" data-tg="${esc(t.name)}">${t.active === false ? '啟用' : '停用'}</button></div></div>`).join('')}`;
+      const run = async (fn, okMsg) => { try { await fn(); await app.reloadMasters(); toast(okMsg, 'ok'); draw(); } catch (e) { toast('失敗：' + e.message, 'er', 5000); } };
+      $('#ita', tb).onclick = () => {
+        const v = validateImpurityName($('#itn', tb).value, list);
+        $('#ite', tb).textContent = v.ok ? '' : v.error;
+        if (v.ok) run(() => app.db.addImpurityType(v.name), `已新增「${v.name}」`);
+      };
+      $$('[data-tg]', tb).forEach((b) => b.onclick = () => { const t = list.find((x) => x.name === b.dataset.tg); run(() => app.db.setImpurityActive(t.name, t.active === false), t.active === false ? '已啟用' : '已停用'); });
+      const move = (name, d) => {
+        const i = list.findIndex((x) => x.name === name), j = i + d; if (j < 0 || j >= list.length) return;
+        const a = list[i], c = list[j];
+        // 兩者順序值對調；若剛好相同（舊資料），以位置重新編號
+        const sa = a.sort_order === c.sort_order ? (j + 1) * 10 : c.sort_order, sc = a.sort_order === c.sort_order ? (i + 1) * 10 : a.sort_order;
+        run(async () => { await app.db.setImpuritySort(a.name, sa); await app.db.setImpuritySort(c.name, sc); }, '已調整順序');
+      };
+      $$('[data-up]', tb).forEach((b) => b.onclick = () => move(b.dataset.up, -1));
+      $$('[data-dn]', tb).forEach((b) => b.onclick = () => move(b.dataset.dn, 1));
     } else if (tab === 'usr') {
       const ps = await app.db.listProfiles();
       tb.innerHTML = `<div class="card info small">帳號由 Supabase 後台「Authentication → Users」建立（登入方式尚未定案，目前暫用電子郵件＋密碼）。新帳號預設<b>停用</b>，請在這裡設定姓名、角色並啟用。</div>

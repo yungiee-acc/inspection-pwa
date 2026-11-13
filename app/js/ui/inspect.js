@@ -1,7 +1,7 @@
 // 手機現場查驗輸入、查驗紀錄查詢與更正
 import { $, $$, h, esc, toast, modal, confirmBox, promptBox, badge, today, can } from './common.js';
 import { validateInspection } from '../core/validate.js';
-import { IMPURITY_TYPES } from '../core/config.js';
+import { selectableNames } from '../core/impurity.js';
 import { uuid, genInspectionId, toLocalInput, fromLocalInput, fmtDateTime, taipeiDate } from '../core/util.js';
 
 const isMine = (app, i) => (app.db.mode === 'local' ? i.created_by === app.profile.display_name : i.created_by === app.profile.id);
@@ -77,7 +77,7 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
     </div>
 
     <label>雜質種類 <span class="opt">（可複選；會印在報告「雜質/備註」欄）</span></label>
-    <div class="chips" id="types">${IMPURITY_TYPES.map((t) => `<button type="button" class="chip" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <div class="chips" id="types">${selectableNames(app.masters.impurityTypes || [], f.impurity_types).map((t) => `<button type="button" class="chip" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
 
     <label>檢驗人 <span class="req">*</span></label><input name="inspector_name" value="${esc(f.inspector_name)}"><div class="fe" data-e="inspector_name"></div>
     <label>備註 <span class="opt">（選填）</span></label><textarea name="note">${esc(f.note || '')}</textarea>
