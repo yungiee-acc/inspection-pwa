@@ -57,15 +57,22 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
   // 手機填的「這車磚數」（選填，正整數）；沒填＝null
   const brickOf = (i) => { const b = Number(i.raw.bricks); return Number.isInteger(b) && b > 0 ? b : null; };
 
+  // 「同日＋同車＋同廠商＋同品項」有幾列（不論是否同一趟）：2 列以上就分不出該配哪一列，需要磚數幫忙
+  const keyOfRow = (h) => `${h.weigh_date}|${normPlate(h.vehicle_no)}|${normText(h.vendor_name)}|${normText(h.item_name)}`;
+  const sameKeyCount = new Map();
+  for (const r of allRows) sameKeyCount.set(keyOfRow(r.hz), (sameKeyCount.get(keyOfRow(r.hz)) || 0) + 1);
+  const needsBricks = (r) => isMultiTrip(r.trip) || sameKeyCount.get(keyOfRow(r.hz)) > 1;
+
   // ---- 計算每列的候選
-  // 磚數只在「同日同車多趟」時用來分辨趟次：有填磚數且與該環資列磚數不同 → 這筆查驗不是這一趟。
-  // 沒填磚數 → 不排除（維持原本規則，交給人工選）。非多趟的車不看磚數（避免單純填錯磚數就配不上）。
+  // 磚數只在「分不出配哪一列」時用來分辨（同日同車多趟，或同趟同品項有多列）：
+  // 有填磚數且與該環資列磚數不同 → 這筆查驗不是這一列。沒填磚數 → 不排除（交給人工選）。
+  // 其他情況不看磚數（避免單純填錯磚數就配不上）。
   for (const r of allRows) {
     const h = r.hz;
     r.candidates = insps.filter((i) => i.date === h.weigh_date && i.plate === normPlate(h.vehicle_no)
       && i.reportName && normText(i.reportName) === normText(h.item_name)
       && i.vendorFull && i.vendorFull === normText(h.vendor_name)
-      && (!isMultiTrip(r.trip) || brickOf(i) === null || brickOf(i) === Number(h.bricks)));
+      && (!needsBricks(r) || brickOf(i) === null || brickOf(i) === Number(h.bricks)));
   }
 
   // ---- 第一階段：套用辦公室已做的決定
