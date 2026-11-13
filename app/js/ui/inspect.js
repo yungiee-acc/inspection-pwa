@@ -66,8 +66,8 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
     <label>樣磚代號 <span class="opt">（可先空白，產生報告前須補填）</span></label><input name="sample_code" value="${esc(f.sample_code)}" inputmode="text" placeholder="例：521">
     <div class="fe" data-e="sample_code"></div>
 
-    <label>這車的磚數 <span class="opt">（選填；同一天同車來兩趟以上時才有用）</span></label><input name="bricks" value="${esc(f.bricks)}" inputmode="numeric" placeholder="例：9">
-    <div class="hint">填了之後，辦公室配對環資時可自動分辨是哪一趟；不知道就留空。</div>
+    <label>抽驗品項的磚數 <span class="opt">（選填）</span></label><input name="bricks" value="${esc(f.bricks)}" inputmode="numeric" placeholder="例：9">
+    <div class="hint">只填「抽驗的這個品項」在這一趟的磚數，不是整車所有品項的總和。同一天同車來兩趟以上時，辦公室可用它自動分辨是哪一趟；不知道就留空。</div>
     <div class="fe" data-e="bricks"></div>
 
     <div class="row2">
