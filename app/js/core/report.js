@@ -99,12 +99,22 @@ export function buildVbaRows(reportModel, meta, erpItems) {
       ErpCode: i.erp_code, ErpName: erp?.name || '', ReportItemName: erp?.report_name || '',
       HzSeqNo: h.seq_no, HzShipNo: h.ship_no, HzGrossKg: h.gross_kg, HzTareKg: h.tare_kg, HzNetKg: h.net_kg, HzBricks: h.bricks,
       ErpWeighTicketNo: '',
-      SampleCode: String(i.sample_code), SampleGrossKg: Number(i.gross_kg), WaterKg: Number(i.water_kg || 0), ImpurityKg: Number(i.impurity_kg || 0), WireKg: Number(i.wire_kg || 0),
+      SampleCode: String(i.sample_code), SampleGrossKg: Number(i.gross_kg), WaterKg: Number(i.water_kg || 0), ImpurityKg: Number(i.impurity_kg || 0), WireKg: Number(i.wire_kg) > 0 ? Number(i.wire_kg) : '', /* 空白＝由 VBA 套用「系統設定」的鐵絲扣重預設值（現為 3.5），不要填 0 */
       ImpurityTypes: (i.impurity_types || []).join('、'), Inspector: i.inspector_name, Note: i.note || '',
       MatchMode: row.decision?.manual ? 'manual' : 'confirmed', ConfirmedBy: row.decision?.decided_by || '', ConfirmedAt: row.decision?.decided_at ? fmtDateTime(row.decision.decided_at) : '',
     });
   }
   return out;
+}
+
+/**
+ * 給 VBA 驗證用的校驗文字（VBA 不易重現上面的 JSON 雜湊，所以另定一個簡單規則）：
+ * 取「VBA匯入資料」從 ReportDate 欄到最後一欄，每格轉成文字（空白＝空字串），欄間以「|」、列間以換行(LF)串接，
+ * 再做 SHA-256（UTF-8）。VBA 端以同樣規則讀回工作表重算並比對。
+ */
+export function vbaChecksumText(vbaRows) {
+  const cols = VBA_COLUMNS.slice(VBA_COLUMNS.findIndex((c) => c[0] === 'ReportDate'));
+  return vbaRows.map((r) => cols.map((c) => String(r[c[0]] ?? '')).join('|')).join('\n');
 }
 
 /** 資料校驗碼的輸入：只含「內容」；排除報告編號／版次／狀態／校驗碼本身，所以草稿與正式版的內容相同時校驗碼也相同 */

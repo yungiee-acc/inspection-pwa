@@ -2,9 +2,9 @@
 // 作法：讀入範本 → 複製「一頁(16列)」的格式（框線、字型、對齊、合併、列高、數字格式）→ 依需要的頁數重複 →
 // 另外加上「VBA匯入資料」與「報告資訊」兩張工作表。
 // 已知限制：範本的「併車大括號」是繪圖形狀，ExcelJS 無法保留，改用 O 欄框線畫成近似的括號。
-import { VBA_COLUMNS } from './report.js';
+import { VBA_COLUMNS, vbaChecksumText } from './report.js';
 import { RULES } from './config.js';
-import { fmtDateTime } from './util.js';
+import { fmtDateTime, sha256 } from './util.js';
 
 const PAGE_ROWS = 16;         // 一頁含：表頭2 + 資料10 + 簽章1 + 空白3
 const FIRST_PAGE_TOP = 3;     // 範本第一頁表頭起始列
@@ -154,7 +154,7 @@ export async function exportReportXlsx({ ExcelJS, templateBuf, reportModel, meta
     ['報告日期', reportModel.weighDate], ['報告編號', meta.reportId], ['版次', `v${meta.version}`], ['審核狀態', statusLabel(meta.status)],
     ['製作人', meta.preparedBy || ''], ['審核人', meta.approvedBy || ''], ['審核時間', meta.approvedAt ? fmtDateTime(meta.approvedAt) : ''],
     ['產生時間', fmtDateTime(meta.createdAt || new Date().toISOString())], ['資料校驗碼(SHA-256)', meta.dataHash || ''],
-    ['VBA匯入筆數', vbaRows.length], ['說明', '本檔「VBA匯入資料」工作表與上方報告頁由同一份資料產生。若報告有更正，請產生新版次，不要手改本檔。'],
+    ['VBA匯入筆數', vbaRows.length], ['VBA資料校驗碼(SHA-256)', await sha256(vbaChecksumText(vbaRows))], ['說明', '本檔「VBA匯入資料」工作表與上方報告頁由同一份資料產生。若報告有更正，請產生新版次，不要手改本檔。'],
   ];
   info.addRow(['進貨查驗報告資訊']).font = { bold: true, size: 14 };
   info.addRow([]);
