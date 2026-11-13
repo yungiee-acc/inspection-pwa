@@ -16,6 +16,14 @@ export function validateInspection(f, ctx) {
   // 樣磚代號：現場可先不填，產生報告前必須補齊（見 match.js 的 NO_SAMPLE_CODE）
   if (!String(f.inspector_name || '').trim()) E('inspector_name', '請填檢驗人');
 
+  // 磚數（選填）：只用來在「同日同車多趟」時分辨是哪一趟，填了就必須是正整數
+  let bricks = null;
+  if (f.bricks !== '' && f.bricks != null) {
+    const b = num(f.bricks);
+    if (b === null || !Number.isInteger(b) || b <= 0) E('bricks', '磚數請填正整數（不知道就留空）');
+    else bricks = b;
+  }
+
   const gross = num(f.gross_kg);
   const water = f.water_kg === '' || f.water_kg == null ? 0 : num(f.water_kg);
   const imp = f.impurity_kg === '' || f.impurity_kg == null ? 0 : num(f.impurity_kg);
@@ -49,5 +57,5 @@ export function validateInspection(f, ctx) {
       && taipeiDate(x.inspected_at) === day && normPlate(x.vehicle_no) === normPlate(f.vehicle_no) && x.erp_code === f.erp_code);
     if (dup.length) W('vehicle_no', `當天已有相同車號＋品項的查驗（${dup.map((d) => d.sample_code).join('、')}）。若是同車第二趟請確認`);
   }
-  return { errors, warnings, values: { gross, water: water ?? 0, imp: imp ?? 0, wire: wire ?? 0 } };
+  return { errors, warnings, values: { bricks, gross, water: water ?? 0, imp: imp ?? 0, wire: wire ?? 0 } };
 }

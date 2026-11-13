@@ -54,12 +54,18 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
 
   const allRows = trips.flatMap((t) => t.rows.map((r) => Object.assign(r, { trip: t })));
 
+  // 手機填的「這車磚數」（選填，正整數）；沒填＝null
+  const brickOf = (i) => { const b = Number(i.raw.bricks); return Number.isInteger(b) && b > 0 ? b : null; };
+
   // ---- 計算每列的候選
+  // 磚數只在「同日同車多趟」時用來分辨趟次：有填磚數且與該環資列磚數不同 → 這筆查驗不是這一趟。
+  // 沒填磚數 → 不排除（維持原本規則，交給人工選）。非多趟的車不看磚數（避免單純填錯磚數就配不上）。
   for (const r of allRows) {
     const h = r.hz;
     r.candidates = insps.filter((i) => i.date === h.weigh_date && i.plate === normPlate(h.vehicle_no)
       && i.reportName && normText(i.reportName) === normText(h.item_name)
-      && i.vendorFull && i.vendorFull === normText(h.vendor_name));
+      && i.vendorFull && i.vendorFull === normText(h.vendor_name)
+      && (!isMultiTrip(r.trip) || brickOf(i) === null || brickOf(i) === Number(h.bricks)));
   }
 
   // ---- 第一階段：套用辦公室已做的決定
@@ -92,7 +98,8 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
     if (c.length === 0) { r.state = 'uninspected'; continue; }
     if (c.length > 1) r.reasons.push({ code: 'MULTI_CANDIDATE', msg: `有 ${c.length} 筆符合的查驗紀錄，無法自動判斷` });
     if (c.some((i) => claims.get(i.id).length > 1)) r.reasons.push({ code: 'INSPECTION_SHARED', msg: '同一筆查驗同時符合多個環資列（同車同品項多趟？）' });
-    if (isMultiTrip(r.trip)) r.reasons.push({ code: 'MULTI_TRIP', msg: '同一天同車號有多趟出貨序號，須人工確認屬於哪一趟' });
+    // 同日同車多趟：只有「剛好 1 筆查驗、且有填磚數並與這一趟吻合」才不需要人工分辨（磚數已在候選階段比對過）
+    if (isMultiTrip(r.trip) && !(c.length === 1 && brickOf(c[0]) !== null)) r.reasons.push({ code: 'MULTI_TRIP', msg: '同一天同車號有多趟出貨序號，須人工確認屬於哪一趟（手機查驗填「磚數」可自動分辨）' });
     if (r.reasons.length) { r.state = 'exception'; r.candidates = c; }
     else { r.state = 'auto'; r.suggested = c[0]; r.candidates = c; }
   }
@@ -111,6 +118,9 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
       if (Math.abs(ratio - 1) > RULES.brickWeightRatioWarn) {
         r.flags.push({ code: 'BRICK_WEIGHT', level: 'warn', msg: `樣磚毛重 ${pair.raw.gross_kg} kg 與該列平均每磚 ${avg.toFixed(1)} kg 差 ${((ratio - 1) * 100).toFixed(0)}%，請確認是否同一批貨` });
       }
+    }
+    if (pair && brickOf(pair) !== null && h.bricks > 0 && brickOf(pair) !== Number(h.bricks)) {
+      r.flags.push({ code: 'BRICKS_DIFF', level: 'warn', msg: `手機填的磚數 ${brickOf(pair)} 與環資磚數 ${h.bricks} 不同，請確認` });
     }
     if (r.confirmed && r.decision?.manual) r.flags.push({ code: 'MANUAL', level: 'info', msg: '人工指定配對' });
   }
@@ -146,7 +156,9 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
     if (!i.vendor) reasons.push({ code: 'VENDOR_UNKNOWN', msg: `廠商代號 ${i.raw.vendor_code} 不在廠商主檔` });
     if (!reasons.length) {
       const sameKey = samePlate.filter((r) => normText(r.hz.vendor_name) === i.vendorFull && normText(r.hz.item_name) === normText(i.reportName));
-      if (sameKey.length) {
+      if (sameKey.length && brickOf(i) !== null && sameKey.every((r) => Number(r.hz.bricks) !== brickOf(i))) {
+        reasons.push({ code: 'BRICKS_MISMATCH', msg: `查驗填的磚數 ${brickOf(i)} 與同日同車同品項的環資磚數（${sameKey.map((r) => r.hz.bricks).join('、')}）都不同，請確認磚數是否填錯；或到「查驗紀錄」更正，或手動指定環資列` });
+      } else if (sameKey.length) {
         const by = sameKey.map((r) => r.confirmed?.id).filter(Boolean);
         reasons.push({ code: 'ALREADY_MATCHED', msg: `符合的環資列已確認配對到${by.length ? `另一筆查驗（${by.join('、')}）` : '「未抽驗」'}，同一列只能對應一筆。若是重複輸入請作廢其中一筆；若確實是不同車次請手動指定環資列` });
       } else if (samePlate.length) {

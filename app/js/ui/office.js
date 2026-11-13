@@ -18,7 +18,7 @@ const STATE = {
   auto: ['建議配對（待確認）', 'y'], confirmed: ['已確認', 'g'], exception: ['異常：需人工選擇', 'r'], uninspected: ['未抽驗', ''],
   none_confirmed: ['已確認未抽驗', 'g'], stale: ['需重新確認', 'r'], conflict: ['重複確認', 'r'],
 };
-const inspLine = (i) => `樣磚 ${esc(i.raw.sample_code)}｜毛重 ${i.raw.gross_kg} kg｜雜質 ${i.raw.impurity_kg ?? 0}｜${esc(fmtDateTime(i.raw.inspected_at).slice(11))}｜${esc(i.raw.inspector_name)}`;
+const inspLine = (i) => `樣磚 ${esc(i.raw.sample_code)}${i.raw.bricks ? `｜${i.raw.bricks} 磚` : ''}｜毛重 ${i.raw.gross_kg} kg｜雜質 ${i.raw.impurity_kg ?? 0}｜${esc(fmtDateTime(i.raw.inspected_at).slice(11))}｜${esc(i.raw.inspector_name)}`;
 
 export async function renderOffice(app, host, params) {
   const view = h('<div></div>'); host.appendChild(view); // 本頁專屬容器（避免事件監聽器累積在共用的 #view 上）
@@ -116,7 +116,7 @@ export async function renderOffice(app, host, params) {
     if (r.state === 'stale') { if (r.suggested) a.push(`<button class="sm" data-a="ok" data-seq="${seq}">重新確認</button>`); a.push(`<button class="sm sec" data-a="undo" data-seq="${seq}">取消先前決定</button>`); }
     if (['confirmed', 'none_confirmed', 'conflict'].includes(r.state)) a.push(`<button class="sm sec" data-a="undo" data-seq="${seq}">取消</button>`);
     if (r.state === 'exception') {
-      a.push(`<select data-sel="${seq}" style="min-height:36px;padding:4px"><option value="">選擇符合的查驗…</option>${r.candidates.map((c) => `<option value="${esc(c.id)}">${esc(c.raw.sample_code)}｜${c.raw.gross_kg}kg｜${esc(fmtDateTime(c.raw.inspected_at).slice(11))}｜${esc(c.raw.inspector_name)}</option>`).join('')}</select>`);
+      a.push(`<select data-sel="${seq}" style="min-height:36px;padding:4px"><option value="">選擇符合的查驗…</option>${r.candidates.map((c) => `<option value="${esc(c.id)}">${esc(c.raw.sample_code)}${c.raw.bricks ? `｜${c.raw.bricks}磚` : ''}｜${c.raw.gross_kg}kg｜${esc(fmtDateTime(c.raw.inspected_at).slice(11))}｜${esc(c.raw.inspector_name)}</option>`).join('')}</select>`);
       a.push(`<button class="sm" data-a="pick" data-seq="${seq}">確認此筆</button>`);
     }
     if (['exception', 'uninspected', 'auto'].includes(r.state)) a.push(`<button class="sm sec" data-a="manual" data-seq="${seq}">手動指定查驗</button>`);

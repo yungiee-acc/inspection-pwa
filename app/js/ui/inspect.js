@@ -37,10 +37,10 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
   const { erpItems, vendors } = app.masters;
   const f = init ? {
     ...init, inspected_at: toLocalInput(init.inspected_at), impurity_types: [...(init.impurity_types || [])],
-    gross_kg: String(init.gross_kg ?? ''), water_kg: init.water_kg ? String(init.water_kg) : '', impurity_kg: init.impurity_kg ? String(init.impurity_kg) : '', wire_kg: init.wire_kg ? String(init.wire_kg) : '',
+    bricks: init.bricks ? String(init.bricks) : '', gross_kg: String(init.gross_kg ?? ''), water_kg: init.water_kg ? String(init.water_kg) : '', impurity_kg: init.impurity_kg ? String(init.impurity_kg) : '', wire_kg: init.wire_kg ? String(init.wire_kg) : '',
   } : {
     client_uuid: uuid(), inspection_id: genInspectionId(), inspected_at: toLocalInput(new Date()),
-    vendor_code: last?.vendor_code || '', vehicle_no: last?.vehicle_no || '', erp_code: '', sample_code: '', gross_kg: '', water_kg: '', impurity_kg: '', wire_kg: '',
+    vendor_code: last?.vendor_code || '', vehicle_no: last?.vehicle_no || '', erp_code: '', sample_code: '', bricks: '', gross_kg: '', water_kg: '', impurity_kg: '', wire_kg: '',
     impurity_types: [], inspector_name: last?.inspector_name || app.profile.display_name, note: '',
   };
   let showAllVendors = !!(f.vendor_code && !vendors.find((v) => v.code === f.vendor_code)?.in_scope);
@@ -66,6 +66,10 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
     <label>樣磚代號 <span class="opt">（可先空白，產生報告前須補填）</span></label><input name="sample_code" value="${esc(f.sample_code)}" inputmode="text" placeholder="例：521">
     <div class="fe" data-e="sample_code"></div>
 
+    <label>這車的磚數 <span class="opt">（選填；同一天同車來兩趟以上時才有用）</span></label><input name="bricks" value="${esc(f.bricks)}" inputmode="numeric" placeholder="例：9">
+    <div class="hint">填了之後，辦公室配對環資時可自動分辨是哪一趟；不知道就留空。</div>
+    <div class="fe" data-e="bricks"></div>
+
     <div class="row2">
       <div><label>樣磚毛重 kg <span class="req">*</span></label><input name="gross_kg" value="${esc(f.gross_kg)}" inputmode="decimal" placeholder="例：512.5"><div class="fe" data-e="gross_kg"></div><div class="fw" data-w="gross_kg"></div></div>
       <div><label>含水重 kg <span class="opt">（無則留空）</span></label><input name="water_kg" value="${esc(f.water_kg)}" inputmode="decimal"><div class="fe" data-e="water_kg"></div><div class="fw" data-w="water_kg"></div></div>
@@ -87,7 +91,7 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
 
   const q = (n) => $(`[name="${n}"]`, root);
   q('erp_code').value = f.erp_code;
-  const sync = () => { for (const n of ['inspected_at', 'vehicle_no', 'erp_code', 'sample_code', 'gross_kg', 'water_kg', 'impurity_kg', 'inspector_name', 'note']) f[n] = q(n).value; };
+  const sync = () => { for (const n of ['inspected_at', 'vehicle_no', 'erp_code', 'sample_code', 'bricks', 'gross_kg', 'water_kg', 'impurity_kg', 'inspector_name', 'note']) f[n] = q(n).value; };
 
   // --- 廠商搜尋下拉
   const vq = q('vq'), dd = $('.dd', root);
@@ -152,7 +156,7 @@ export function buildForm(app, { init = null, mode = 'new', last = null, onSaved
     const row = {
       inspection_id: f.inspection_id, client_uuid: f.client_uuid, inspected_at: fromLocalInput(f.inspected_at),
       vendor_code: f.vendor_code, vendor_name: vendors.find((x) => x.code === f.vendor_code).full_name,
-      vehicle_no: f.vehicle_no.trim().toUpperCase(), erp_code: f.erp_code, sample_code: f.sample_code.trim(),
+      vehicle_no: f.vehicle_no.trim().toUpperCase(), erp_code: f.erp_code, sample_code: f.sample_code.trim(), bricks: v.bricks,
       gross_kg: v.gross, water_kg: v.water, impurity_kg: v.imp, wire_kg: v.wire, impurity_types: f.impurity_types,
       inspector_name: f.inspector_name.trim(), note: f.note.trim(),
     };
@@ -264,7 +268,7 @@ export async function openDetail(app, i, onChange) {
     m.el.innerHTML = `<h3>查驗 ${esc(i.inspection_id)} ${i.status === 'void' ? badge('已作廢', 'r') : ''}${i.locked ? badge('已鎖定', 'b') : ''}</h3>
       <dl class="kv"><dt>時間</dt><dd>${esc(fmtDateTime(i.inspected_at))}</dd><dt>廠商</dt><dd>${esc(i.vendor_code)} ${esc(i.vendor_name || '')}</dd><dt>車號</dt><dd>${esc(i.vehicle_no)}</dd>
       <dt>品項</dt><dd>${esc(i.erp_code)} ${esc(erp?.name || '')}<br><span class="muted small">報告名稱：${esc(erp?.report_name || '（尚未對照）')}</span></dd>
-      <dt>樣磚</dt><dd>${esc(i.sample_code)}</dd><dt>重量(kg)</dt><dd>毛重 ${i.gross_kg}｜含水 ${i.water_kg ?? 0}｜雜質 ${i.impurity_kg ?? 0}</dd>
+      <dt>樣磚</dt><dd>${esc(i.sample_code)}</dd><dt>磚數</dt><dd>${i.bricks ? esc(i.bricks) : '—'}</dd><dt>重量(kg)</dt><dd>毛重 ${i.gross_kg}｜含水 ${i.water_kg ?? 0}｜雜質 ${i.impurity_kg ?? 0}</dd>
       <dt>雜質種類</dt><dd>${esc((i.impurity_types || []).join('、') || '—')}</dd><dt>檢驗人</dt><dd>${esc(i.inspector_name)}</dd><dt>備註</dt><dd>${esc(i.note || '—')}</dd><dt>版次</dt><dd>${i.rev}</dd></dl>
       <div class="actions">${canEdit(app, i) ? '<button id="ed">編輯／更正</button>' : ''}<button class="sec" id="cl">關閉</button></div>
       ${i.locked && !can(app, 'admin') ? '<p class="small muted">此筆已納入已審核報告，需管理員解鎖後才能更正。</p>' : ''}
