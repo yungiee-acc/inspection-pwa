@@ -26,19 +26,13 @@ function previewHtml(rm, info) {
       const BR = '<svg viewBox="0 0 10 100" preserveAspectRatio="none"><path d="M0,0 C8,0 5,15 5,35 C5,45 6,50 10,50 C6,50 5,55 5,65 C5,85 8,100 0,100" fill="none" stroke="#1f5fa8" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>';
       if (!r) return '<tr>' + '<td></td>'.repeat(8) + '<td>□</td>' + '<td></td>'.repeat(4) + '<td class="br"></td><td class="l" style="border-left:none"></td></tr>';
       const h2 = r.hz, first = r.tripIndex === 0, s = r.sample;
-      // 備註欄：只在「該趟最後一列」或「下一列有自己的備註」時才畫下方橫線
-      const nx = pg[k + 1];
-      const lineBelow = !nx || nx.tripIndex === 0 || !!nx.pText;
-      const noteStyle = `border-left:none;${k > 0 ? 'border-top:none;' : ''}${lineBelow ? '' : 'border-bottom:none;'}`;
-      // 括號欄：每一趟的第一列放一格（跨該趟在本頁的所有列）；併車才畫括號
-      let brCell = '';
-      if (first || k === 0) {
-        let span = 1; while (pg[k + span] && pg[k + span].trip.key === r.trip.key) span++;
-        brCell = `<td class="br" rowspan="${span}">${r.trip.multi && span > 1 ? BR : ''}</td>`;
-      }
+      // 括號欄：每列一格（保留每列底線，與範本相同）；併車的第一列放一個高度等於整趟列數的括號
+      let span = 1;
+      if (first) while (pg[k + span] && pg[k + span].trip.key === r.trip.key) span++;
+      const brCell = `<td class="br">${first && r.trip.multi && span > 1 ? BR.replace('<svg', `<svg style="height:calc(${span}*100% - 4px)"`) : ''}</td>`;
       return `<tr>${first ? `<td>${esc(h2.ship_no.slice(0, 9))} <b style="color:#1f5fa8">${esc(h2.ship_no.slice(9))}</b></td><td>${esc(r.trip.vendorDisplay)}</td><td>${esc(r.trip.vehicle_no)}</td>` : '<td></td><td></td><td></td>'}
         <td style="font-size:12px">${esc(h2.item_name)}</td><td>${h2.bricks}</td><td class="n">${fmtKg(h2.gross_kg)}</td><td class="n">${fmtKg(h2.tare_kg)}</td><td class="n">${fmtKg(h2.gross_kg - h2.tare_kg)}</td>
-        <td>${r.inspection ? '▓' : '□'}</td><td>${s ? esc(s.code) : ''}</td><td>${s ? esc(s.gross) : ''}</td><td>${s ? esc(s.water) : ''}</td><td>${s ? esc(s.impurity) : ''}</td>${brCell}<td class="l" style="${noteStyle}">${esc(r.pText || '')}</td></tr>`;
+        <td>${r.inspection ? '▓' : '□'}</td><td>${s ? esc(s.code) : ''}</td><td>${s ? esc(s.gross) : ''}</td><td>${s ? esc(s.water) : ''}</td><td>${s ? esc(s.impurity) : ''}</td>${brCell}<td class="l" style="border-left:none">${esc(r.pText || '')}</td></tr>`;
     }).join('')}</table>
     <div class="sig"><div>受補貼機構簽章</div><div>稽核員簽章</div></div><div class="pg">第 ${pi + 1} 頁，共 ${rm.pages.length} 頁</div></div></div>`).join('');
 }

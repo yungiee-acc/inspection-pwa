@@ -55,7 +55,7 @@ button:disabled{opacity:.5;cursor:not-allowed}button.block{display:block;width:1
 .rpt{background:#fff;border:1px solid #999;margin:0 0 16px;font-family:"PMingLiU","新細明體",serif;min-width:760px}
 .rpt h4{margin:0;padding:8px;text-align:center;font-size:18px}.rpt .meta{display:flex;justify-content:space-between;padding:2px 8px;font-size:14px}
 .rpt table{width:100%;border-collapse:collapse;font-size:13px}.rpt th,.rpt td{border:1px solid #333;padding:3px 4px;text-align:center;height:30px}.rpt td.l{text-align:left;font-size:12px}.rpt td.n{text-align:right}
-.rpt td.br{position:relative;width:18px;min-width:18px;padding:0;border-right:none;border-top:none}.rpt td.br svg{position:absolute;left:0;top:2px;width:100%;height:calc(100% - 4px)}
+.rpt td.br{position:relative;width:16px;min-width:16px;padding:0;border-right:none}.rpt td.br svg{position:absolute;left:0;top:2px;width:100%;z-index:1;overflow:visible}
 .rpt .sig{display:flex}.rpt .sig div{flex:1;text-align:center;padding:6px;border:1px solid #333}
 .rpt .pg{text-align:center;font-size:12px;padding:4px;color:#555}
 .stamp{display:inline-block;border:2px solid;border-radius:6px;padding:0 8px;font-weight:700;transform:rotate(-3deg)}
