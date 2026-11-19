@@ -57,6 +57,10 @@ export async function exportReportXlsx({ ExcelJS, templateBuf, reportModel, meta
   const notes = [];
   for (let r = 5; r <= 12; r++) notes.push(tpl.getCell(r, 18).value);
 
+  // 括號欄(O)原本寬度只有 1，放不下括號；從備註欄(P)匀 3 個字元寬度給它（總寬不變）
+  ws.getColumn(15).width = Math.round((tpl.getColumn(15).width + 3) * WIDTH_FIX * 100) / 100;
+  ws.getColumn(16).width = Math.round((tpl.getColumn(16).width - 3) * WIDTH_FIX * 100) / 100;
+
   // ---- 標題兩列
   for (let rr = 0; rr < 2; rr++) {
     ws.getRow(rr + 1).height = titleSnap[rr].height;
@@ -105,14 +109,43 @@ export async function exportReportXlsx({ ExcelJS, templateBuf, reportModel, meta
         set(10, '□');
       }
     });
-    // 併車括號（近似）：整趟 ≥2 列時，在 O 欄畫「]」
+    // ---- 框線與併車括號
+    // 規則：「雜質/備註」欄(P)只在「該趟最後一列」或「下一列有自己的備註」時才畫橫線，
+    //       同趟內沒有備註的列之間不畫線；括號欄(O)不畫直線、只在趟次結尾畫底線。
+    const BL = { style: 'thin' };
+    ws.getCell(top, 15).border = { top: BL };
+    ws.getCell(top, 16).border = { top: BL, right: BL };
+    ws.getCell(top + 1, 15).border = { bottom: BL };
+    ws.getCell(top + 1, 16).border = { bottom: BL, right: BL };
+    const lineBelowOf = (k) => {
+      const row = rows[k], next = rows[k + 1];
+      if (!row || !next) return true;
+      if (next.tripIndex === 0) return true;      // 下一列是新的一趟
+      return !!next.pText;                        // 下一列有自己的備註
+    };
     rows.forEach((row, k) => {
-      if (!row || !row.trip.multi) return;
-      const r = top + 2 + k;
-      const first = row.tripIndex === 0, last = row.tripIndex === row.trip.rows.length - 1;
-      const c = ws.getCell(r, 15);
-      c.border = { ...(c.border || {}), right: { style: 'thin' }, ...(first ? { top: { style: 'thin' } } : {}), ...(last ? { bottom: { style: 'thin' } } : {}) };
+      const r = top + 2 + k, lb = lineBelowOf(k);
+      ws.getCell(r, 16).border = { right: BL, ...(lb ? { bottom: BL } : {}) };
+      ws.getCell(r, 15).border = lb ? { bottom: BL } : {};
     });
+    // 併車括號：整趟 ≥2 列時，把 O 欄合併成一格，放藍色「}」
+    for (let k = 0; k < rows.length;) {
+      const row = rows[k];
+      if (!row || !row.trip.multi) { k++; continue; }
+      let e = k;
+      while (e + 1 < rows.length && rows[e + 1] && rows[e + 1].trip.key === row.trip.key) e++;
+      if (e > k) {
+        const r1 = top + 2 + k, r2 = top + 2 + e;
+        ws.mergeCells(r1, 15, r2, 15);
+        let hgt = 0; for (let r = r1; r <= r2; r++) hgt += ws.getRow(r).height || 25;
+        const c = ws.getCell(r1, 15);
+        c.value = '}';
+        c.font = { name: 'Arial', size: Math.max(12, Math.min(48, Math.round(hgt * 0.85))), color: { argb: 'FF1F5FA8' } };
+        c.alignment = { horizontal: 'center', vertical: 'middle' };
+        c.border = { bottom: BL };
+      }
+      k = e + 1;
+    }
     // 下拉選單
     for (let k = 0; k < RULES.rowsPerPage; k++) {
       const r = top + 2 + k;
