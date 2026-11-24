@@ -130,11 +130,13 @@ export async function exportReportXlsx({ ExcelJS, templateBuf, reportModel, meta
 
   const lastRow = FIRST_PAGE_TOP + (pageCount - 1) * PAGE_ROWS + 12; // 最後一頁的簽章列
   ws.pageSetup = {
-    paperSize: 9, orientation: 'landscape', horizontalCentered: true, scale: 100,
+    paperSize: 9, orientation: 'landscape', horizontalCentered: true,
+    // 寬度強制縮放到一頁寬（高度不限），避免欄寬換算差異時 P 欄被擠到下一頁，需要手動拉邊界
+    fitToPage: true, fitToWidth: 1, fitToHeight: 0,
     printArea: `A1:P${lastRow}`, printTitlesRow: '1:2',
-    margins: { left: 0.3937007874015748, right: 0.3937007874015748, top: 0.3149606299212598, bottom: 0.1968503937007874, header: 0.3149606299212598, footer: 0.2755905511811024 },
+    margins: { left: 0.3937007874015748, right: 0.3937007874015748, top: 0.3149606299212598, bottom: 0.3937007874015748, header: 0.3149606299212598, footer: 0.1968503937007874 },
   };
-  ws.headerFooter.oddFooter = `&C第 &P 頁，共 &N 頁&R版次 v${meta.version}｜${statusLabel(meta.status)}｜${(meta.dataHash || '').slice(0, 8)}`;
+  ws.headerFooter.oddFooter = `&C第&P頁，共&N頁`;
 
   // ================= 工作表：VBA匯入資料 =================
   const vs = wb.addWorksheet('VBA匯入資料', { views: [{ state: 'frozen', ySplit: 2, xSplit: 7 }] });
