@@ -27,6 +27,9 @@ async function createLocalDb() {
 
   const [erp0, ven0] = await Promise.all([fetch('data/erp_items.json').then((r) => r.json()), fetch('data/vendors.json').then((r) => r.json())]);
   const needRole = (roles) => { if (!roles.includes(me()?.role)) throw new Error('權限不足'); };
+  // 某日是否「已審核且未解鎖」：配對決定不可改
+  const dateLocked = (d) => S.reports.some((r) => r.report_date === d && r.status === 'approved' && !r.unlocked_at);
+  const LOCK_MSG = '本日報告已審核鎖定，需管理員解鎖更正後才能修改配對';
 
   const db = {
     mode: 'local',
@@ -116,8 +119,8 @@ async function createLocalDb() {
     },
 
     async listDecisions(date) { const o = {}; for (const [k, v] of Object.entries(S.decisions)) if (v._date === date) { const { _date, ...rest } = v; o[k] = rest; } return o; },
-    async setDecisions(list, date) { needRole(['office', 'admin']); for (const { key, value } of list) { audit('match_decisions', key, S.decisions[key] ? 'update' : 'insert', S.decisions[key], value); S.decisions[key] = { ...value, _date: date }; } persist(); },
-    async clearDecision(key) { needRole(['office', 'admin']); audit('match_decisions', key, 'delete', S.decisions[key], null); delete S.decisions[key]; persist(); },
+    async setDecisions(list, date) { needRole(['office', 'admin']); if (dateLocked(date)) throw new Error(LOCK_MSG); for (const { key, value } of list) { audit('match_decisions', key, S.decisions[key] ? 'update' : 'insert', S.decisions[key], value); S.decisions[key] = { ...value, _date: date }; } persist(); },
+    async clearDecision(key) { needRole(['office', 'admin']); if (dateLocked(S.decisions[key]?._date)) throw new Error(LOCK_MSG); audit('match_decisions', key, 'delete', S.decisions[key], null); delete S.decisions[key]; persist(); },
 
     async listReports(date) { return S.reports.filter((r) => r.report_date === date).sort((a, b) => b.version - a.version); },
     async createReportDraft({ report_date, snapshot, data_hash, inspection_ids, reason }) {
@@ -137,8 +140,19 @@ async function createLocalDb() {
     async unlockDate(date, reason) {
       needRole(['admin']);
       const r = S.reports.find((x) => x.report_date === date && x.status === 'approved'); if (!r) throw new Error('這一天沒有已審核的報告');
+      if (r.unlocked_at) throw new Error('這一天已是更正中');
       for (const i of S.inspections) if (r.inspection_ids.includes(i.inspection_id)) i.locked = false;
+      r.unlocked_at = nowIso(); r.unlocked_by = me().display_name;
       audit('reports', r.id, 'unlock', null, { reason }); persist();
+    },
+    async relockDate(date, dataHash) {
+      needRole(['admin']);
+      const r = S.reports.find((x) => x.report_date === date && x.status === 'approved'); if (!r) throw new Error('這一天沒有已審核的報告');
+      if (!r.unlocked_at) throw new Error('這一天不是更正中');
+      if (r.data_hash !== dataHash) throw new Error('解鎖期間資料已有異動，請建立新版次，不能重新鎖定');
+      for (const i of S.inspections) if (r.inspection_ids.includes(i.inspection_id)) i.locked = true;
+      r.unlocked_at = null; r.unlocked_by = null;
+      audit('reports', r.id, 'relock', null, { version: r.version }); persist();
     },
     async deleteDraft(id) { needRole(['office', 'admin']); const r = S.reports.find((x) => x.id === id); if (r?.status !== 'draft') throw new Error('只能刪除草稿'); S.reports = S.reports.filter((x) => x.id !== id); audit('reports', id, 'delete', { version: r.version }, null); persist(); },
 
@@ -158,6 +172,8 @@ async function createSupabaseDb() {
   const getBox = () => { try { return JSON.parse(localStorage.getItem(OUTBOX)) || []; } catch { return []; } };
   const setBox = (b) => localStorage.setItem(OUTBOX, JSON.stringify(b));
   const must = ({ data, error }) => { if (error) throw Object.assign(new Error(error.message), { code: error.code, details: error }); return data; };
+  // 配對決定：審核後（未解鎖）的日期不能改（資料庫也會擋，這裡只是讓錯誤訊息清楚）
+  const assertDecisionsOpen = async (date) => { const { error } = await sb.rpc('assert_decisions_open', { p_date: date }); if (error) throw new Error(error.message); };
   let profile = null;
   const isNetErr = (e) => /fetch|network|Failed to|load failed/i.test(e?.message || '') && !e?.code;
 
@@ -250,9 +266,14 @@ async function createSupabaseDb() {
     async listDecisions(date) { const rows = must(await sb.from('match_decisions').select('key,value').eq('report_date', date)); const o = {}; rows.forEach((r) => { o[r.key] = r.value; }); return o; },
     async setDecisions(list, date) {
       if (!list.length) return;
+      await assertDecisionsOpen(date);
       must(await sb.from('match_decisions').upsert(list.map(({ key, value }) => ({ key, report_date: date, value })), { onConflict: 'key' }));
     },
-    async clearDecision(key) { must(await sb.from('match_decisions').delete().eq('key', key)); },
+    async clearDecision(key) {
+      const row = must(await sb.from('match_decisions').select('report_date').eq('key', key).maybeSingle());
+      if (row) await assertDecisionsOpen(row.report_date);
+      must(await sb.from('match_decisions').delete().eq('key', key));
+    },
 
     async listReports(date) { return must(await sb.from('reports').select('*').eq('report_date', date).order('version', { ascending: false })); },
     async createReportDraft({ report_date, snapshot, data_hash, inspection_ids, reason }) {
@@ -262,6 +283,7 @@ async function createSupabaseDb() {
     },
     async approveReport(id) { const { data, error } = await sb.rpc('approve_report', { p_id: id }); if (error) throw new Error(error.message); return data; },
     async unlockDate(date, reason) { const { error } = await sb.rpc('unlock_report_date', { p_date: date, p_reason: reason }); if (error) throw new Error(error.message); },
+    async relockDate(date, dataHash) { const { error } = await sb.rpc('relock_report_date', { p_date: date, p_hash: dataHash }); if (error) throw new Error(error.message); },
     async deleteDraft(id) { must(await sb.from('reports').delete().eq('id', id).eq('status', 'draft')); },
 
     outboxCount() { return getBox().length; },

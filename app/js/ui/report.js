@@ -15,7 +15,8 @@ export async function computeReport(app, ctx) {
 }
 
 function previewHtml(rm, info) {
-  const stamp = info.status === 'approved' ? `<span class="stamp" style="color:#1d7a3a;border-color:#1d7a3a">已審核 v${info.version}</span>`
+  const stamp = info.status === 'approved' && info.unlocked ? `<span class="stamp" style="color:#b26a00;border-color:#b26a00">更正中 v${info.version}</span>`
+    : info.status === 'approved' ? `<span class="stamp" style="color:#1d7a3a;border-color:#1d7a3a">已審核 v${info.version}</span>`
     : info.status === 'superseded' ? `<span class="stamp" style="color:#888;border-color:#888">已被新版取代 v${info.version}</span>`
     : `<span class="stamp" style="color:#b26a00;border-color:#b26a00">草稿 v${info.version}（未審核）</span>`;
   return rm.pages.map((pg, pi) => `<div class="scroll"><div class="rpt">
@@ -53,8 +54,14 @@ export async function renderReport(app, host, params) {
     const hasDraft = reports.some((r) => r.status === 'draft');
     const model = ctx.model;
     const stale = !!shown && shown.data_hash !== cur.dataHash; // 此版次的內容是否已和目前資料不同
+    const approvedRow = reports.find((r) => r.status === 'approved') || null;
+    const unlocked = !!approvedRow?.unlocked_at; // 更正中：已審核版次暫停下載，等新版審核
+    const dlBlocked = !!shown && shown.status === 'approved' && unlocked; // 下載 Excel 反灰
+    const shownLabel = dlBlocked ? '更正中' : statusLabel(shown?.status);
 
     let html = '';
+    // ---- 更正中提示條
+    if (unlocked) html += `<div class="card warn"><b>狀態為更正中，需審核新版次才能下載 Excel</b><div class="small">v${approvedRow.version} 已解鎖，「下載正式報告 Excel」暫停。${stale ? '資料已有改動，請建立新版次並審核。' : '若沒有任何改動，管理員可按「重新鎖定」，恢復 v' + approvedRow.version + ' 可下載。'}</div></div>`;
     // ---- 前置條件
     if (!model.ready) html += `<div class="card warn"><b>還不能產生新版次：尚有 ${model.blockers.length} 項待處理</b><ul class="small" style="margin:4px 0 0 18px;padding:0">${model.blockers.slice(0, 8).map((b) => `<li>${esc(b.msg)}</li>`).join('')}</ul><div class="actions"><a class="btn sm" href="#/office?date=${date}">回到配對處理</a></div></div>`;
     else if (!hasDraft && (!latest || latest.data_hash !== cur.dataHash)) {
@@ -63,22 +70,23 @@ export async function renderReport(app, host, params) {
     if (cur.reportModel.warnings.length) html += `<div class="card warn small"><b>報告提醒：</b><ul style="margin:4px 0 0 18px;padding:0">${[...new Set(cur.reportModel.warnings)].map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>`;
 
     // ---- 版本列表
-    html += `<h3>版本與審核紀錄</h3>${reports.length ? `<div class="scroll"><table class="tbl"><tr><th>版次</th><th>狀態</th><th>製作</th><th>審核</th><th>原因／說明</th><th></th></tr>${reports.map((r) => `<tr ${shown?.id === r.id ? 'style="background:#e3f2ec"' : ''}><td>v${r.version}</td><td>${badge(statusLabel(r.status), r.status === 'approved' ? 'g' : r.status === 'draft' ? 'y' : '')}</td><td>${esc(r.created_by || '')}<br><span class="small muted">${esc(fmtDateTime(r.created_at))}</span></td><td>${r.approved_by ? `${esc(r.approved_by)}<br><span class="small muted">${esc(fmtDateTime(r.approved_at))}</span>` : '—'}</td><td class="small">${esc(r.reason || '')}</td><td><button class="sm sec" data-v="${r.id}">檢視</button></td></tr>`).join('')}</table></div>` : '<p class="muted small">尚無任何版次</p>'}`;
+    html += `<h3>版本與審核紀錄</h3>${reports.length ? `<div class="scroll"><table class="tbl"><tr><th>版次</th><th>狀態</th><th>製作</th><th>審核</th><th>原因／說明</th><th></th></tr>${reports.map((r) => `<tr ${shown?.id === r.id ? 'style="background:#e3f2ec"' : ''}><td>v${r.version}</td><td>${r.status === 'approved' && r.unlocked_at ? badge('更正中', 'y') : badge(statusLabel(r.status), r.status === 'approved' ? 'g' : r.status === 'draft' ? 'y' : '')}</td><td>${esc(r.created_by || '')}<br><span class="small muted">${esc(fmtDateTime(r.created_at))}</span></td><td>${r.approved_by ? `${esc(r.approved_by)}<br><span class="small muted">${esc(fmtDateTime(r.approved_at))}</span>` : '—'}</td><td class="small">${esc(r.reason || '')}</td><td><button class="sm sec" data-v="${r.id}">檢視</button></td></tr>`).join('')}</table></div>` : '<p class="muted small">尚無任何版次</p>'}`;
 
     // ---- 預覽
     if (shown) {
       const snap = shown.snapshot;
-      html += `<h3>預覽：v${shown.version} ${esc(statusLabel(shown.status))}</h3>`;
-      if (stale && shown.status !== 'superseded') html += `<div class="card ${shown.status === 'approved' ? 'warn' : 'err'} small"><b>${shown.status === 'approved' ? '注意：目前的查驗／配對資料已和這個已審核版次不同。' : '這份草稿已過期：資料在草稿建立後有變動。'}</b>${shown.status === 'approved' ? '正式報告仍以此版次為準；若要更正，請由管理員「解鎖更正」後建立新版次。' : '請刪除這份草稿並重新建立。'}</div>`;
+      html += `<h3>預覽：v${shown.version} ${esc(shownLabel)}</h3>`;
+      if (stale && shown.status !== 'superseded') html += `<div class="card ${shown.status === 'approved' ? 'warn' : 'err'} small"><b>${shown.status === 'approved' ? '注意：目前的查驗／配對資料已和這個已審核版次不同。' : '這份草稿已過期：資料在草稿建立後有變動。'}</b>${shown.status === 'approved' ? (unlocked ? '目前為更正中，請建立新版次並審核。' : '正式報告仍以此版次為準；若要更正，請由管理員「解鎖更正」後建立新版次。') : '請刪除這份草稿並重新建立。'}</div>`;
       html += `<div class="actions noprint" style="margin:0 0 10px">
         ${shown.status === 'draft' && canApprove ? '<button id="ap">審核確認（正式生效）</button>' : ''}
         ${shown.status === 'draft' ? '<button class="sec dng" id="dd">刪除草稿</button>' : ''}
-        ${shown.status === 'approved' ? '<button id="xl">下載正式報告 Excel</button>' : ''}
-        ${shown.status === 'approved' && isAdmin ? '<button class="sec" id="ul">解鎖本日查驗（更正用）</button>' : ''}
+        ${shown.status === 'approved' ? `<button id="xl" ${dlBlocked ? 'disabled title="更正中，需審核新版次後才能下載"' : ''}>下載正式報告 Excel</button>` : ''}
+        ${shown.status === 'approved' && isAdmin && !unlocked ? '<button class="sec" id="ul">解鎖本日查驗（更正用）</button>' : ''}
+        ${shown.status === 'approved' && isAdmin && unlocked && !stale ? '<button class="sec" id="rl">重新鎖定（取消更正）</button>' : ''}
         <button class="sec" id="pr">列印預覽</button></div>
         ${shown.status === 'draft' ? '<div class="small muted">草稿不能下載正式 Excel；請先審核確認。</div>' : ''}
         <div class="small muted noprint" style="margin-bottom:6px">下方畫面為示意排版；正式 Excel 依你提供的範例版型輸出（含「VBA匯入資料」與「報告資訊」工作表，共 ${snap.vbaRows.length} 筆查驗）。</div>
-        ${previewHtml(snap.reportModel, { status: shown.status, version: shown.version })}`;
+        ${previewHtml(snap.reportModel, { status: shown.status, version: shown.version, unlocked: dlBlocked })}`;
     }
     body.innerHTML = html;
 
@@ -109,8 +117,13 @@ export async function renderReport(app, host, params) {
       const reason = await promptBox('解鎖後，本日查驗可以被修改。請填寫原因：', { title: '解鎖更正', placeholder: '例：發現樣磚毛重輸入錯誤' }); if (!reason) return;
       try { await app.db.unlockDate(date, reason); toast('已解鎖。請到「查驗紀錄」更正，再回「環資配對」重新確認，最後建立新版次。', 'ok', 7000); draw(); } catch (e) { toast('解鎖失敗：' + e.message, 'er', 6000); }
     };
+    const rl = $('#rl', body);
+    if (rl) rl.onclick = async () => {
+      if (!await confirmBox(`重新鎖定後，本日查驗與配對會再次鎖住，v${shown.version} 恢復可下載。\n\n確定重新鎖定？`, { okText: '重新鎖定' })) return;
+      try { await app.db.relockDate(date, cur.dataHash); toast(`已重新鎖定，v${shown.version} 可再下載`, 'ok', 5000); draw(); } catch (e) { toast('重新鎖定失敗：' + e.message, 'er', 7000); }
+    };
     const xl = $('#xl', body);
-    if (xl) xl.onclick = async () => {
+    if (xl && !xl.disabled) xl.onclick = async () => {
       xl.disabled = true; xl.textContent = '產生中…';
       try {
         await loadExcelJs();
