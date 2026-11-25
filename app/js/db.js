@@ -85,7 +85,7 @@ async function createLocalDb() {
       const r = S.inspections.find((i) => i.inspection_id === id);
       if (!r) throw new Error('找不到這筆查驗');
       if (r.rev !== expectedRev) throw Object.assign(new Error('CONFLICT'), { code: 'CONFLICT' });
-      if (r.locked && me().role !== 'admin') throw Object.assign(new Error('LOCKED'), { code: 'LOCKED' });
+      if (r.locked) throw Object.assign(new Error('LOCKED'), { code: 'LOCKED' }); // 已審核鎖定：含管理員在內都不能直接改
       if (me().role === 'inspector' && r.created_by !== me().display_name) throw new Error('只能修改自己建立的查驗');
       const old = { ...r };
       Object.assign(r, patch, { rev: r.rev + 1, updated_at: nowIso(), updated_by: me().display_name, change_reason: reason || null });

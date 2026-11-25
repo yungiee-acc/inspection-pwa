@@ -11,7 +11,7 @@ const erpLabel = (i) => `${i.code} ${i.name}`;
 
 export function canEdit(app, i) {
   if (i.status === 'void') return false;
-  if (i.locked && !can(app, 'admin')) return false;
+  if (i.locked) return false; // 已審核鎖定：任何人（含管理員）都不能直接改，需先解鎖
   if (can(app, 'inspector') && !isMine(app, i)) return false;
   return true;
 }
@@ -271,7 +271,7 @@ export async function openDetail(app, i, onChange) {
       <dt>樣磚</dt><dd>${esc(i.sample_code)}</dd><dt>磚數</dt><dd>${i.bricks ? esc(i.bricks) : '—'}</dd><dt>重量(kg)</dt><dd>毛重 ${i.gross_kg}｜含水 ${i.water_kg ?? 0}｜雜質 ${i.impurity_kg ?? 0}</dd>
       <dt>雜質種類</dt><dd>${esc((i.impurity_types || []).join('、') || '—')}</dd><dt>檢驗人</dt><dd>${esc(i.inspector_name)}</dd><dt>備註</dt><dd>${esc(i.note || '—')}</dd><dt>版次</dt><dd>${i.rev}</dd></dl>
       <div class="actions">${canEdit(app, i) ? '<button id="ed">編輯／更正</button>' : ''}<button class="sec" id="cl">關閉</button></div>
-      ${i.locked && !can(app, 'admin') ? '<p class="small muted">此筆已納入已審核報告，需管理員解鎖後才能更正。</p>' : ''}
+      ${i.locked ? '<p class="small muted">此筆已納入已審核報告，需管理員在「報告頁」解鎖後才能更正。</p>' : ''}
       <h3>異動紀錄</h3>${hist.length ? `<div class="small">${hist.map((a) => `<div style="border-top:1px solid var(--bd);padding:4px 0">${esc(fmtDateTime(a.at))}｜${esc(a.actor_name || '')}｜${esc(a.action)}${a.new?.change_reason ? `｜原因：${esc(a.new.change_reason)}` : ''}</div>`).join('')}</div>` : '<p class="muted small">無</p>'}`;
     $('#cl', m.el).onclick = () => m.close();
     const ed = $('#ed', m.el);
