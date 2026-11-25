@@ -83,11 +83,15 @@ export async function renderOffice(app, host, params) {
   }
 
   // ---------------- 主畫面
+  // 本日已審核且未解鎖：配對操作按鈕隱藏（資料庫也會擋，這裡只是避免誤按）
+  let locked = false;
   async function refresh() {
     const main = $('#main', view);
     if (!date) { main.innerHTML = ''; return; }
     main.innerHTML = '<p class="muted">載入中…</p>';
     ctx = await loadMatchContext(app, date);
+    const reps = await app.db.listReports(date);
+    locked = reps.some((r) => r.status === 'approved' && !r.unlocked_at);
     draw();
   }
 
@@ -101,16 +105,17 @@ export async function renderOffice(app, host, params) {
         <div class="${S.exception + S.stale ? 'bad' : ''}"><b>${S.exception + S.stale}</b>異常</div><div class="${S.orphans ? 'bad' : ''}"><b>${S.orphans}</b>無歸屬查驗</div>
         <div class="${S.tripsNoInspection ? 'bad' : ''}"><b>${S.tripsNoInspection}</b>整車無查驗</div></div>
       <div class="actions" style="margin:0 0 12px">
-        ${S.auto ? `<button id="all">一鍵確認全部建議配對（${S.auto} 筆）</button>` : ''}
+        ${S.auto && !locked ? `<button id="all">一鍵確認全部建議配對（${S.auto} 筆）</button>` : ''}
         <a class="btn ${model.ready ? '' : 'sec'}" href="#/report?date=${date}">${model.ready ? '④ 前往產生報告預覽' : '前往報告頁（尚有 ' + blockN + ' 項待處理）'}</a></div>
       ${blockN ? `<div class="card warn small"><b>尚未完成（${blockN} 項）：</b><ul style="margin:4px 0 0 18px;padding:0">${model.blockers.slice(0, 12).map((b) => `<li>${esc(b.msg)}</li>`).join('')}${blockN > 12 ? `<li>…還有 ${blockN - 12} 項</li>` : ''}</ul></div>` : '<div class="card okc"><b>✔ 所有項目都已處理，可以產生報告預覽。</b></div>'}
       ${model.orphans.filter((o) => !o.dismissed).length ? '<h3>無對應環資的查驗紀錄</h3>' + model.orphans.filter((o) => !o.dismissed).map(orphanCard).join('') : ''}
       <h3>全部趟次</h3>${model.trips.map(tripCard).join('')}
-      ${model.orphans.filter((o) => o.dismissed).length ? `<h3>已排除的查驗（不納入報告）</h3>${model.orphans.filter((o) => o.dismissed).map((o) => `<div class="card small">${esc(o.inspection.id)}｜${esc(o.inspection.raw.vehicle_no)}｜原因：${esc(o.dismissed.note)} <button class="sm sec" data-a="undis" data-id="${esc(o.inspection.id)}">復原</button></div>`).join('')}` : ''}`;
+      ${model.orphans.filter((o) => o.dismissed).length ? `<h3>已排除的查驗（不納入報告）</h3>${model.orphans.filter((o) => o.dismissed).map((o) => `<div class="card small">${esc(o.inspection.id)}｜${esc(o.inspection.raw.vehicle_no)}｜原因：${esc(o.dismissed.note)} ${locked ? '' : `<button class="sm sec" data-a="undis" data-id="${esc(o.inspection.id)}">復原</button>`}</div>`).join('')}` : ''}`;
     const all = $('#all', main); if (all) all.onclick = async () => { if (await confirmBox(`將確認 ${S.auto} 筆「唯一符合」的建議配對。\n請確定你已看過下方配對內容。`, { okText: '全部確認' })) save(autoConfirmDecisions(model, me)); };
   }
 
   const rowActions = (r) => {
+    if (locked) return ''; // 已審核鎖定：不顯示配對操作
     const seq = r.hz.seq_no, a = [];
     if (r.state === 'auto') a.push(`<button class="sm" data-a="ok" data-seq="${seq}">確認</button>`);
     if (r.state === 'stale') { if (r.suggested) a.push(`<button class="sm" data-a="ok" data-seq="${seq}">重新確認</button>`); a.push(`<button class="sm sec" data-a="undo" data-seq="${seq}">取消先前決定</button>`); }
@@ -138,7 +143,7 @@ export async function renderOffice(app, host, params) {
           ${pair ? `<div class="small" style="margin-top:4px">${r.confirmed ? '✔' : '→'} ${inspLine(pair)}　<span class="muted">${esc(pair.id)}</span></div>` : ''}
           ${r.decision?.note ? `<div class="small muted">備註：${esc(r.decision.note)}（${esc(r.decision.decided_by || '')}）</div>` : ''}
           ${r.reasons.map((x) => `<div class="fe">${esc(x.msg)}</div>`).join('')}
-          ${r.flags.some((f) => f.code === 'UNKNOWN_ITEM' && f.level === 'block') ? (isAdmin ? `<button class="sm" data-a="ack" data-seq="${r.hz.seq_no}">管理員確認此品名可用</button>` : '<div class="small fe">需管理員確認此品名</div>') : ''}
+          ${r.flags.some((f) => f.code === 'UNKNOWN_ITEM' && f.level === 'block') ? (locked ? '' : isAdmin ? `<button class="sm" data-a="ack" data-seq="${r.hz.seq_no}">管理員確認此品名可用</button>` : '<div class="small fe">需管理員確認此品名</div>') : ''}
           <div class="actions" style="margin-top:6px">${rowActions(r)}</div></div>`;
       }).join('')}
       ${t.state === 'no_inspection' ? '<div class="hint">規定：每一車至少要有一個品項被查驗。請請現場補輸入查驗，或對上方任一品項用「手動指定查驗」。</div>' : ''}
@@ -151,7 +156,7 @@ export async function renderOffice(app, host, params) {
     return `<div class="card ${hardErr ? 'err' : 'warn'}"><div class="t1"><span>${esc(i.raw.vehicle_no)}　${esc(i.vendor?.short_name || i.raw.vendor_code)}</span><span class="small">${esc(fmtDateTime(i.raw.inspected_at).slice(11))}</span></div>
       <div class="small">${esc(i.raw.erp_code)} ${esc(i.erp?.name || '')}｜樣磚 ${esc(i.raw.sample_code)}｜${i.raw.gross_kg} kg｜${esc(i.id)}</div>
       ${o.reasons.map((r) => `<div class="${r.level === 'warn' ? 'fw' : 'fe'}">${esc(r.msg)}</div>`).join('')}
-      <div class="actions"><button class="sm" data-a="assign" data-id="${esc(i.id)}">手動指定環資列</button><button class="sm sec" data-a="dismiss" data-id="${esc(i.id)}">排除此查驗（不納入報告）</button></div></div>`;
+      ${locked ? '' : `<div class="actions"><button class="sm" data-a="assign" data-id="${esc(i.id)}">手動指定環資列</button><button class="sm sec" data-a="dismiss" data-id="${esc(i.id)}">排除此查驗（不納入報告）</button></div>`}</div>`;
   }
 
   // ---------------- 事件
