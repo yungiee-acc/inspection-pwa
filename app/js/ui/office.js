@@ -147,9 +147,10 @@ export async function renderOffice(app, host, params) {
 
   function orphanCard(o) {
     const i = o.inspection;
-    return `<div class="card err"><div class="t1"><span>${esc(i.raw.vehicle_no)}　${esc(i.vendor?.short_name || i.raw.vendor_code)}</span><span class="small">${esc(fmtDateTime(i.raw.inspected_at).slice(11))}</span></div>
+    const hardErr = o.reasons.some((r) => r.level !== 'warn'); // 只有「疑似」的情況用黃色，其餘維持紅色
+    return `<div class="card ${hardErr ? 'err' : 'warn'}"><div class="t1"><span>${esc(i.raw.vehicle_no)}　${esc(i.vendor?.short_name || i.raw.vendor_code)}</span><span class="small">${esc(fmtDateTime(i.raw.inspected_at).slice(11))}</span></div>
       <div class="small">${esc(i.raw.erp_code)} ${esc(i.erp?.name || '')}｜樣磚 ${esc(i.raw.sample_code)}｜${i.raw.gross_kg} kg｜${esc(i.id)}</div>
-      ${o.reasons.map((r) => `<div class="fe">${esc(r.msg)}</div>`).join('')}
+      ${o.reasons.map((r) => `<div class="${r.level === 'warn' ? 'fw' : 'fe'}">${esc(r.msg)}</div>`).join('')}
       <div class="actions"><button class="sm" data-a="assign" data-id="${esc(i.id)}">手動指定環資列</button><button class="sm sec" data-a="dismiss" data-id="${esc(i.id)}">排除此查驗（不納入報告）</button></div></div>`;
   }
 

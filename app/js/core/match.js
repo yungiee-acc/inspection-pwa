@@ -130,6 +130,11 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
       r.flags.push({ code: 'BRICKS_DIFF', level: 'warn', msg: `手機填的磚數 ${brickOf(pair)} 與環資磚數 ${h.bricks} 不同，請確認` });
     }
     if (r.confirmed && r.decision?.manual) r.flags.push({ code: 'MANUAL', level: 'info', msg: '人工指定配對' });
+    // 已配對但車號或廠商與查驗不同：持續以黃色標示（之後審核的人也看得到）
+    if (r.confirmed) {
+      if (r.confirmed.plate !== normPlate(h.vehicle_no)) r.flags.push({ code: 'PLATE_DIFF', level: 'warn', msg: `疑似車號輸入錯誤：查驗車號「${r.confirmed.raw.vehicle_no}」與環資車號「${h.vehicle_no}」不同` });
+      if (r.confirmed.vendorFull !== normText(h.vendor_name)) r.flags.push({ code: 'VENDOR_DIFF', level: 'warn', msg: `疑似回收商選錯：查驗廠商「${r.confirmed.vendor?.full_name || r.confirmed.raw.vendor_code}」與環資廠商「${h.vendor_name}」不同` });
+    }
   }
 
   // ---- 趟次狀態
@@ -170,11 +175,11 @@ export function buildMatchModel({ hzRows, inspections, erpItems, vendors, decisi
         reasons.push({ code: 'ALREADY_MATCHED', msg: `符合的環資列已確認配對到${by.length ? `另一筆查驗（${by.join('、')}）` : '「未抽驗」'}，同一列只能對應一筆。若是重複輸入請作廢其中一筆；若確實是不同車次請手動指定環資列` });
       } else if (samePlate.length) {
         const sameVendor = samePlate.filter((r) => normText(r.hz.vendor_name) === i.vendorFull);
-        if (!sameVendor.length) reasons.push({ code: 'VENDOR_MISMATCH', msg: `同日同車號的環資廠商是「${[...new Set(samePlate.map((r) => r.hz.vendor_name))].join('、')}」，與查驗的「${i.vendor.full_name}」不同` });
-        else reasons.push({ code: 'ITEM_MISMATCH', msg: `同日同車號的環資品項是「${sameVendor.map((r) => r.hz.item_name).join('、')}」，沒有「${i.reportName}」` });
+        if (!sameVendor.length) reasons.push({ code: 'VENDOR_MISMATCH', level: 'warn', msg: `疑似回收商選錯：同日同車號的環資廠商是「${[...new Set(samePlate.map((r) => r.hz.vendor_name))].join('、')}」，與查驗的「${i.vendor.full_name}」不同` });
+        else reasons.push({ code: 'ITEM_MISMATCH', level: 'warn', msg: `疑似品項選錯：同日同車號的環資品項是「${sameVendor.map((r) => r.hz.item_name).join('、')}」，沒有「${i.reportName}」` });
       } else {
         const sv = sameDay.filter((r) => normText(r.hz.vendor_name) === i.vendorFull);
-        if (sv.length) reasons.push({ code: 'PLATE_MISMATCH', msg: `同日同廠商的環資車號是「${[...new Set(sv.map((r) => r.hz.vehicle_no))].join('、')}」，與查驗車號「${i.raw.vehicle_no}」不同` });
+        if (sv.length) reasons.push({ code: 'PLATE_MISMATCH', level: 'warn', msg: `疑似車號輸入錯誤：同日同廠商的環資車號是「${[...new Set(sv.map((r) => r.hz.vehicle_no))].join('、')}」，與查驗車號「${i.raw.vehicle_no}」不同，請確認是哪一方錯誤` });
         else reasons.push({ code: 'NO_HZ_ROW', msg: '環資檔內找不到這個日期＋廠商＋車號的資料（環資檔可能尚未匯入或日期不同）' });
       }
     }

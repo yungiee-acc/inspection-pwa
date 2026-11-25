@@ -29,6 +29,8 @@ export function buildReportModel({ model, vendors, weighDate }) {
   for (const t of model.trips) {
     const vd = resolveVendorDisplay(t.vendor_name, vendors);
     if (vd.warn) warnings.push(vd.warn);
+    // 已配對但車號或廠商不同：列入報告提醒，讓審核的人也看得到
+    for (const r of t.rows) for (const f of r.flags) if (f.code === 'PLATE_DIFF' || f.code === 'VENDOR_DIFF') warnings.push(`序號 ${r.hz.seq_no}｜${f.msg}`);
     const multi = t.rows.length > 1;
     const rows = t.rows.map((r, k) => {
       const insp = r.confirmed?.raw || null;
